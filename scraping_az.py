@@ -3,6 +3,7 @@ import requests as rq
 from Recette import Recette
 import re
 import numpy as np
+from serde.json import to_json
 
 def get_pays(url:str) -> list[str]:
     res = rq.get(url)
@@ -57,26 +58,72 @@ def _scrap_nb_comment(soupe : BS) -> str:
     nb_comment = soupe.find("b").text
     return nb_comment
 
+def _scrap_ingredients(soupe:BS):
+    ingredients_nom = soupe.find_all("span", class_ = "ingredient_label")
+    ing_nom = [ingredient.text for ingredient in ingredients_nom]
+    
+    ingredients_qte = soupe.find_all("span", class_ = "js-ingredient-qte ingredient_qte")
+    ing_qte= [ingredient.text for ingredient in ingredients_qte]
+    return ing_nom, ing_qte
+
+def _scrap_baklava(soupe:BS) -> str:
+    img = soupe.find("img", class_="imgRecipe").get("src")
+    return img
+
+def _scrap_etapes(soupe:BS) -> list[str]:    
+    list_etapes = []
+
+    etapes = soupe.find("section", class_="borderSection instructions").find_all("p")
+    for etape in etapes:
+        list_etapes.append(etape.find("span"))
+        
+    rec_etapes = [etape.text for etape in list_etapes if etape != None]
+    return rec_etapes
+
+def _scrap_toulousaing(soupe:BS) -> list[str]:
+    comments = soupe.find_all("div", class_ = "comment")
+    list_comments = []
+    for comment in comments:
+        list_comments.append(comment.find("p", class_ = "serif-secondary").text)
+    return list_comments
+
 def scrap(lien:str) -> Recette:
     soupe = _soupage(lien)
     main_infos = _scrap_main_infos(soupe)
+    ing = _scrap_ingredients(soupe)
     res = Recette(
         nom = _scrap_name(soupe),
         note = None,
         temps = main_infos[0],
         niveau = main_infos[1],
         cout = main_infos[2],
-        nb_comment = _scrap_nb_comment(soupe)
-        )
+        nb_comment = _scrap_nb_comment(soupe),
+        ingredient_nom = ing[0],
+        ingredient_qte = ing[1],
+        img = _scrap_baklava(soupe),
+        recette = _scrap_etapes(soupe),
+        comment = _scrap_toulousaing(soupe),
+        pays = None
+    )
     return res
 
 def get_pipeline(url:str):
     urls_pays = get_pays(url)
     nb_page = get_page_pays(urls_pays)
-    urls_in_pays = get_url_pays(urls_pays[0], nb_page)
-    lien_recette_pays = get_url_recette(urls_in_pays)
-    for lien in lien_recette_pays:
-        try:
-            print(scrap(lien))
-        except:
-            pass
+    rec = 0
+    recette = []
+    for url in urls_pays:
+        
+        urls_in_pays = get_url_pays(url, nb_page)
+        lien_recette_pays = get_url_recette(urls_in_pays)
+        for lien in lien_recette_pays:
+            try:
+                recette.append(scrap(lien))
+                rec = rec + 1
+                print(f"Recette n°{rec} scrapé !")
+            except:
+                pass
+    rec_json = to_json(recette)
+    with open("data/recette.json", "w", encoding="utf-8") as json_file:
+        json_file.write(rec_json)
+    return print("Export JSON réalisé")

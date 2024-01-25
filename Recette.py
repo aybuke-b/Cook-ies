@@ -12,3 +12,9 @@ class Recette:
     niveau : str
     cout : str
     nb_comment : str
+    ingredient_nom : list[str]
+    ingredient_qte : list[str]
+    img : str
+    recette : list[str]
+    comment : list[str]
+    pays : str
