@@ -7,7 +7,6 @@ from serde import serialize
 class Recette:
     """Classe de l'output brut du scraping"""
     nom: str
-    note : str
     temps : str
     niveau : str
     cout : str
