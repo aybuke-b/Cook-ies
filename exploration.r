@@ -4,6 +4,7 @@ library(tidyverse)
 df = read_parquet("data/recette.parquet")
 colnames(df)
 
+
 df %>%
     ggplot()+
     aes(x = cout)+
@@ -27,7 +28,14 @@ df %>%
     ggplot()+
     aes(x = log(temps), y = cout)+
     geom_point()+
-    geom_smooth(method = 'lm')+
-    theme_minimal()
+    geom_smooth(method = 'lm', se = FALSE)+
+    theme_minimal() 
 
+df[df$cout == min(df$cout),][1]
+df[df$nb_comment == max(df$nb_comment),]
+df[df$temps == max(df$temps),]
 
+df[df$nb_comment > 5,]
+
+colnames(df)
+summary(df[,c(1:5,8,11)])
