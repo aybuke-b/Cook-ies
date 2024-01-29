@@ -41,7 +41,10 @@ def _clean_nb_comment(df:pl.DataFrame) -> pl.DataFrame:
 def _clean_pays(df:pl.DataFrame) -> pl.DataFrame:
     df = df.with_columns(
         pl.col("pays")
-        .str.replace("https://www.cuisineaz.com/cuisine-du-monde/", "")
+        .str.replace("https://www.cuisineaz.com", "")
+        .str.replace("/cuisine-du-monde/", "")
+        .str.replace("/recettes-", "")
+        .str.replace(r".{5}$","")
     )
     return df
 
