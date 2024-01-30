@@ -17,7 +17,7 @@ def _clean_temps(df:pl.DataFrame) -> pl.DataFrame:
     )
     
     df = df.with_columns(
-        temps = pl.col("h") * 60 + pl.col("min")
+        temps = (pl.col("h") * 60 + pl.col("min"))/60
     )
     df = df.drop("h", "min")
     return df
