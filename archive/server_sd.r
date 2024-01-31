@@ -9,9 +9,9 @@ server <- function(input, output) {
 #----------------------------PLOT----------------------------#
     output$plot_cout <- renderPlot({
         df %>%
-            #filter(pays == input$select_pays) %>%
-            #filter(niveau == input$select_niveau) %>%
-            #filter(temps < input$select_temps) %>%
+            filter(pays == input$select_pays) %>%
+            filter(niveau == input$select_niveau) %>%
+            filter(temps < input$select_temps) %>%
                 ggplot()+
                     aes(x = cout)+
                     geom_histogram(bins = 50,
@@ -23,11 +23,10 @@ server <- function(input, output) {
     })
 #----------------------------TABLE----------------------------# 
   output$table_recette <- render_gt({
-    df_rec <- df[,c("nom","pays", "niveau", "temps", "cout", "img")] 
-    #  filter(pays == input$select_pays) %>%
-    #  filter(niveau == input$select_niveau) %>%
-    #  filter(temps < input$select_temps)
-    
+    df_rec <- df[,c("nom","pays", "niveau", "temps", "cout", "img")] |> 
+      filter(pays == input$select_pays) %>%
+      filter(niveau == input$select_niveau) %>%
+      filter(temps < input$select_temps)
     df_rec |> 
         gt() |> 
           opt_interactive(use_compact_mode = TRUE) |> 
