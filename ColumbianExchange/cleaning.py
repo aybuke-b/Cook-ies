@@ -48,11 +48,30 @@ def _clean_pays(df:pl.DataFrame) -> pl.DataFrame:
     )
     return df
 
+
+def clean_pays2(df : pl.DataFrame) -> pl.DataFrame:
+    df = df.with_columns(
+        pl.col("pays")
+        .str.replace("irlandaises", "irlande")
+        .str.replace("norvegiennes", "norvege")
+        .str.replace("libanaises", "liban")
+        .str.replace("africaines", "afrique")
+        .str.replace("indonesiennes", "indonesie")
+        .str.replace("vietnamiennes", "vietnam")
+        .str.replace("coreennes", "corée du sud")
+        .str.to_titlecase()
+    )
+    return df
+
+
 def clean_pipeline(df:pl.DataFrame) -> pl.DataFrame:
     df = (
         df.pipe(_clean_temps)
         .pipe(_clean_cout)
         .pipe(_clean_nb_comment)
         .pipe(_clean_pays)
+        .pipe(clean_pays2)
     )
     return df
+
+
