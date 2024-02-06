@@ -16,8 +16,6 @@ df <- read.csv("data/comment_en.csv",
                fileEncoding = "utf-8")
 df <- df[,-c(3)]
 
-liste_perso <- c("a")
-
 ## SENTIMENT
 
 ### afinn
@@ -100,14 +98,59 @@ nrc_count |>
   top_n(10) |> 
   ungroup() |> 
   ggplot(aes(x = reorder(word, n), y = n)) + 
-  geom_col(fill = "orchid", alpha = 0.6) +
+  geom_col(fill = "royalblue", alpha = 0.6) +
   facet_wrap(~sentiment, nrow= 1, scale = "free") + 
   coord_flip()+
   labs(x = "word")
 
 #score = merge(score_afinn, score_bing[,-c(2,3)], by = "nom")
 
+df_words <- df |> 
+  mutate(niveau = as_factor(niveau),
+         pays = as_factor(pays)) |> 
+  unnest_tokens(output=words,
+                input=comment_en,
+                token="words") |> 
+  group_by(words) |> summarise(freq = n())
+
+my_stop_words <- tibble(
+  word = c("1","2", "it's", "4", "5", "3", "30", "g", "10"),
+  lexicon = "autres"
+)
+
+df_words_filter <- df_words |> 
+  anti_join(bind_rows(rbind(get_stopwords("en")),my_stop_words), 
+            by = c("words"="word")) |> 
+  filter(freq >= 50)
+
+wordcloud(words = df_words_filter$words,
+          freq = df_words_filter$freq,
+          colors = brewer.pal(8, "Dark2"),
+          random.order=FALSE,
+          rot.per=0.0)
+
+df_words_pays <- df |> 
+  mutate(niveau = as_factor(niveau),
+         pays = as_factor(pays)) |> 
+  unnest_tokens(output=words,
+                input=comment_en,
+                token="words") |> 
+  group_by(words, pays) |> summarise(freq = n())
+
+df_words_pays_filter <- df_words_pays |> 
+  anti_join(bind_rows(rbind(get_stopwords("en")),my_stop_words), 
+            by = c("words"="word")) |> 
+  filter(freq >= 40)
+
+df_words_pays_filter |> 
+  ggplot()+
+  aes(x = fct_reorder(words,freq), y = freq)+
+  geom_bar(stat="identity")+
+  facet_wrap(~pays)+
+  coord_flip()
+
 ### TEXTDATA
+liste_perso <- c("a", "s", "t")
 
 res_td <- TextData(df,
          var.text = c("comment_en"),
@@ -134,10 +177,10 @@ plot(res_td,
 
 
 
-#res_lexCA <- LexCA(res_td, graph = FALSE)
-#
-#plot(res_lexCA,
-#     gtype = "DocWord",
-#     title = "Représentation graphique des mots",
-#     col.word = "orange",
-#     col.doc = "royalblue")
+res_lexCA <- LexCA(res_td, graph = FALSE, ncp = 2)
+
+plot(res_lexCA,
+     gtype = "DocWord",
+     title = "Représentation graphique des mots",
+     col.word = "orange",
+     col.doc = "royalblue")
