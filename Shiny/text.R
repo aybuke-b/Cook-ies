@@ -28,16 +28,46 @@ score_afinn <- df |> select("comment_en", "nom") |>
   summarise(sentiment = sum(value))
 
 ### bing
-score_bing <- df |> select("comment_en", "nom") |>
+score_bing <- df |> select("comment_en", "nom", "pays") |>
   unnest_tokens(word,comment_en) |> 
   inner_join(get_sentiments("bing")) |> 
-  group_by(nom) |> 
+  group_by(nom, pays) |> 
   summarise(
     positive = sum(sentiment == "positive"),
     negative = sum(sentiment == "negative"))
 
 score_bing <- score_bing |> 
   mutate(ratio = positive / (negative + positive)) 
+
+liste_pays <- score_bing |> 
+  count(pays) |>
+  group_by(pays) |> 
+  summarise(nb_recette = sum(n)) |> 
+  arrange(desc(nb_recette)) |> 
+  top_n(15) |> 
+  as.list()
+
+mean_ratio <- score_bing |>
+  filter(pays %in% liste_pays$pays) |>
+  group_by(pays) |>
+  summarize(mean_ratio = mean(ratio))
+
+ggplot(score_bing |>
+         filter(pays %in% liste_pays$pays),
+       aes(x = ratio)) +
+  geom_density(fill = "royalblue", color = "black", alpha = 0.15) +
+  theme_minimal() +
+  xlim(0, 1) +
+  facet_wrap(~ pays,
+             scales = "free") +
+  geom_vline(data = mean_ratio,
+             aes(xintercept = mean_ratio), 
+             color = "red",
+             linetype = "dashed",
+             size = 1)+
+  labs(x = "Ratio",
+       y = "Densité",
+       title = "Distribution des scores par pays")
 
 bing_count <- df |> select("comment_en", "nom") |>
   unnest_tokens(word,comment_en) |> 
@@ -49,10 +79,11 @@ bing_count |>
   top_n(10) |> 
   ungroup() |> 
   ggplot(aes(x = reorder(word, n), y = n)) + 
-  geom_col(fill = "orchid", alpha = 0.6) +
+  geom_col(fill = "royalblue", alpha = 0.35) +
   facet_wrap(~sentiment, nrow= 1, scale = "free") + 
   coord_flip()+
-  labs(x = "word")
+  labs(x = "word")+
+  theme_minimal()
 
 ### nrc
 score_nrc <- df |> select("comment_en", "nom") |>
@@ -95,9 +126,9 @@ res_td <- TextData(df,
 summary(res_td)
 
 plot(res_td,
-     nword = 40,
+     nword = 20,
      sel = "word",
-     title = "Les 10 mots les plus fréquents",
+     title = "Les 20 mots les plus fréquents",
      xtitle = "Fréquences",
      col.fill = "azure2")
 
