@@ -13,6 +13,7 @@ path <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/")
 source(paste0(path, "server.R"))
 
 df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
+
 df$temps <- round(df$temps,2)
 
 custom_theme <- bs_theme(bootswatch = "spacelab")
@@ -21,6 +22,7 @@ ui <- page_navbar(
   theme = custom_theme,
   title = HTML("Cook'ies"),
   sidebar = sidebar(
+    checkboxInput("select_all", "Tous cocher", value = FALSE),
     selectInput(
       "select_pays",
       "Pays",
@@ -61,7 +63,10 @@ ui <- page_navbar(
   ),
   nav_panel(
     title = "Map",
-    p("Third tab content")
+    card(
+      card_header("Map"),
+      plotlyOutput("map_monde")
+    )
   ),
   nav_spacer(),
   nav_menu(
