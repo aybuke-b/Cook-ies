@@ -4,28 +4,24 @@ library(tidyverse)
 library(arrow)
 library(gt)
 library(shinydashboard)
+library(plotly)
 
 server <- function(input, output) {
 #----------------------------PLOT----------------------------#
-    output$plot_cout <- renderPlot({
-        df %>%
-            filter(pays == input$select_pays) %>%
-            filter(niveau == input$select_niveau) %>%
-            filter(temps < input$select_temps) %>%
-                ggplot()+
-                    aes(x = cout)+
-                    geom_histogram(bins = 50,
-                                   fill = 'royalblue',
-                                   alpha = 0.5)+
-                    theme_minimal()+
-                    labs(title = "Titre")
+    output$plot_cout <- renderPlotly({
+        df_plot <- df |> 
+            filter(pays %in% input$select_pays) |> 
+            filter(niveau %in% input$select_niveau) |> 
+            filter(temps < input$select_temps) 
+          
+            plot_ly(x = df_plot$cout, type = "histogram")
 
     })
 #----------------------------TABLE----------------------------# 
   output$table_recette <- render_gt({
-    df_rec <- df[,c("nom","pays", "niveau", "temps", "cout", "img")] 
-      filter(pays == input$select_pays) %>%
-      filter(niveau == input$select_niveau) %>%
+    df_rec <- df[,c("img", "nom","pays", "niveau", "temps", "cout")] |> 
+      filter(pays %in% input$select_pays) |> 
+      filter(niveau %in% input$select_niveau) |> 
       filter(temps < input$select_temps)
     
     df_rec |> 
@@ -42,7 +38,6 @@ server <- function(input, output) {
             ) |> 
           tab_header("Recettes")
   })
-  
 #----------------------------TABLE----------------------------#  
   output$nb_recette <- renderValueBox({
     n_row <- df[,c("nom","pays", "niveau", "temps", "cout", "img")] |> 
