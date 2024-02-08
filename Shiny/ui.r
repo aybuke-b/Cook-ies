@@ -6,23 +6,35 @@ library(bslib)
 library(DT)
 library(shinydashboard)
 library(shinythemes)
-library(shiny)
-library(shinythemes)
+library(fontawesome)
+library(bsicons)
 
 path <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/")
 source(paste0(path, "server.R"))
 
-df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
+df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.parquet")
 
 df$temps <- round(df$temps,2)
 
-custom_theme <- bs_theme(bootswatch = "spacelab")
+title_css <- ".title { font-family: 'Satisfy', cursive; font-weight: bold; font-size: 24px;}"
+custom_theme <- bs_theme(
+  version = 5,
+  primary = "#74736e",
+  bg = "#FFFFFF",
+  fg = "#74736e",
+  font_scale = 1.1,
+  heading_font = font_google("Playfair Display"),
+  base_font = font_google("Roboto")
+)
+
+test <- bs_add_rules(custom_theme, title_css)
+
 
 ui <- page_navbar(
-  theme = custom_theme,
-  title = HTML("Cook'ies"),
+  theme = test,
+  title = span(class = "title", img(src = "logo2.png", height = 90), "Cook'ies"),
   sidebar = sidebar(
-    checkboxInput("select_all", "Tous cocher", value = FALSE),
+    checkboxInput("select_all", "Tout cocher", value = FALSE),
     selectInput(
       "select_pays",
       "Pays",
@@ -48,21 +60,50 @@ ui <- page_navbar(
     )
   ),
   nav_panel(
-    title = "Consultation",
+    title = "Accueil 🏠︎", 
+    layout_columns(
+      value_box(
+        title = "Nombre total de recettes",
+        value = nrow(df),
+        showcase = bs_icon("cookie"),
+        theme = "#7e7e75"),
+      value_box(
+        title = "Nombre de pays",
+        value = length(unique(df$pays)),
+        showcase = bs_icon("geo"),
+        theme = "#7e7e75"
+      )),
+      layout_columns(
+      value_box(
+        title = "Coût moyen par personne et par recette",
+        value = round(mean(df$cout),3),
+        showcase = bs_icon("cash-stack"),
+        theme = "#b2b1a4"
+      ),
+      value_box(
+        title = "Temps moyen par recette",
+        value = round(mean(df$temps),3),
+        showcase = bs_icon("clock-history"),
+        theme = "#b2b1a4"
+      )
+    )
+    ),
+  nav_panel(
+    title = "Recettes 🍽️",
     card(
       card_header("Les recettes"),
-      gt_output("table_recette")
+      gt_output("table_recette") 
     )
   ),
   nav_panel(
-    title = "Statistiques",
+    title = "Statistiques 📊",
     card(
       card_header("Les coûts"),
       plotlyOutput("plot_cout")
     )
   ),
   nav_panel(
-    title = "Map",
+    title = "Carte 🗺",
     card(
       card_header("Map"),
       plotlyOutput("map_monde")
@@ -74,3 +115,4 @@ ui <- page_navbar(
     align = "right"
   )
 )
+

@@ -5,6 +5,7 @@ library(arrow)
 library(gt)
 library(shinydashboard)
 library(plotly)
+library(fontawesome)
 
 iso3 <- data.frame(
   pays = c(
@@ -59,7 +60,14 @@ server <- function(input, output) {
                 )
               }
             ) |> 
-          tab_header("Recettes")
+          tab_header("Recettes 🥣") |>
+          cols_label(
+            img = html(fontawesome::fa("camera-retro"),"Image"),
+            nom = html(fontawesome::fa("utensils"),"Nom"),
+            pays = html(fontawesome::fa("globe"),"Pays"),
+            niveau = html(fontawesome::fa("layer-group"),"Niveau"),
+            temps = html(fontawesome::fa("clock"),"Temps"),
+            cout = html(fontawesome::fa("sack-dollar"),"Coût/pers"))
   })
 #----------------------------TABLE----------------------------#  
   output$map_monde <- renderPlotly({
