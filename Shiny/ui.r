@@ -16,7 +16,9 @@ df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.
 
 df$temps <- round(df$temps,2)
 
-title_css <- ".title { font-family: 'Satisfy', cursive; font-weight: bold; font-size: 24px;}"
+title_css <- ".title { font-family: 'Satisfy', cursive; font-weight: bold; } "
+
+
 custom_theme <- bs_theme(
   version = 5,
   primary = "#74736e",
@@ -66,19 +68,19 @@ ui <- page_navbar(
         title = "Nombre total de recettes",
         value = nrow(df),
         showcase = bs_icon("cookie"),
-        theme = "#7e7e75"),
+        theme = value_box_theme(bg = "#e6f2fd", fg = "#0B538E")),
       value_box(
         title = "Nombre de pays",
         value = length(unique(df$pays)),
         showcase = bs_icon("geo"),
-        theme = "#7e7e75"
-      )),
+        theme = value_box_theme(bg = "#fcedf3", fg = "#80616c"))
+      ),
       layout_columns(
       value_box(
         title = "Coût moyen par personne et par recette",
         value = round(mean(df$cout),3),
         showcase = bs_icon("cash-stack"),
-        theme = "#b2b1a4"
+        theme = value_box_theme(bg = "#e2dbcf", fg = "#938d7f" )
       ),
       value_box(
         title = "Temps moyen par recette",
