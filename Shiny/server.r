@@ -6,6 +6,7 @@ library(gt)
 library(shinydashboard)
 library(plotly)
 library(fontawesome)
+library(bslib)
 
 iso3 <- data.frame(
   pays = c(
@@ -24,6 +25,26 @@ iso3 <- data.frame(
     "CMR", "CIV", "MUS", "MAR", "SEN", "TUN", "AUS", "IDN", "NZL", "GLP", "GUF", "MTQ", "NCL", "REU", "PYF"
   )
 )
+
+
+iso2 <- data.frame(
+  pays = c(
+    "Allemagne", "Autriche", "Belgique", "Bulgarie", "Crete", "Croatie", "Espagne", "Grece", "Hongrie",
+    "Irlande", "Italie", "Lituanie", "Norvege", "Pologne", "Portugal", "Roumanie", "Royaume-Uni",
+    "Suede", "Suisse", "Turquie", "Azerbaidjan", "Chine", "Coree du Sud", "Inde", "Israel", "Japon", "Laos",
+    "Liban", "Russie", "Thailande", "Vietnam", "Etats-Unis", "Canada", "Cuba", "Mexique", "Argentine", "Bresil", "Chili", "Perou", "Venezuela", "Afghanistan", "Afrique du Sud", "Algerie",
+    "Benin", "Cameroun", "Cote d'Ivoire", "Ile Maurice", "Maroc", "Senegal", "Tunisie", "Australie", "Indonesie",
+    "Nouvelle Zelande", "Guadeloupe", "Guyane", "Martinique", "Nouvelle Caledonie", "Reunion", "Tahiti"
+  ),
+  iso_alpha2 = c(
+    "DE", "AT", "BE", "BG", "GR", "HR", "ES", "GR", "HU", "IE", "IT", "LT", "NO", "PL", "PT", "RO", "GB",
+    "SE", "CH", "TR", "AZ", "CN", "KP", "IN", "IL", "JP", "LA", "LB", "RU", "TH", "VN", "US", "CA", "CU", "MX", "AR", "BR", "CL", "PE", "VE", "AF", "ZA", "DZ", "BJ", "CM", "CI", "MU", "MA", "SN", "TN", "AU", "ID", "NZ", "GP", "GF", "MQ", "NC", "RE", "PF"
+  )
+)
+
+get_flag_url <- function(country_name) {
+  iso2$iso_alpha2[match(tolower(country_name), tolower(iso2$pays))]
+}
 
 server <- function(input, output) {
 #----------------------------PLOT----------------------------#
@@ -48,6 +69,8 @@ server <- function(input, output) {
         filter(niveau %in% input$select_niveau) |> 
         filter(temps < input$select_temps))
     
+    df_rec$flag <- sapply(df_rec$pays, get_flag_url)
+    
     df_rec |> 
         gt() |> 
           opt_interactive(use_compact_mode = TRUE) |> 
@@ -60,6 +83,12 @@ server <- function(input, output) {
                 )
               }
             ) |> 
+      fmt_integer() |>
+      fmt_flag(columns = flag) |>
+      cols_merge(
+        columns = c(pays, flag),
+        pattern = "{2} {1}"
+      ) |>
           tab_header("Recettes 🥣") |>
           cols_label(
             img = html(fontawesome::fa("camera-retro"),"Image"),
@@ -67,7 +96,7 @@ server <- function(input, output) {
             pays = html(fontawesome::fa("globe"),"Pays"),
             niveau = html(fontawesome::fa("layer-group"),"Niveau"),
             temps = html(fontawesome::fa("clock"),"Temps"),
-            cout = html(fontawesome::fa("sack-dollar"),"Coût/pers"))
+            cout = html(fontawesome::fa("sack-dollar"),"Coût/pers")) 
   })
 #----------------------------TABLE----------------------------#  
   output$map_monde <- renderPlotly({
@@ -85,3 +114,7 @@ server <- function(input, output) {
   
 }
 
+#----------------------------VALUE BOX----------------------------# 
+
+
+  
