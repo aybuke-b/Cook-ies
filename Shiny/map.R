@@ -20,8 +20,6 @@ iso3 <- data.frame(
   )
 )
 
-df <- merge(data, iso3, by = "pays", all.x = TRUE)
-
 df_mc <- df |> 
   group_by(iso_alpha3, pays) |> summarise(mean_cout = mean(cout))
 
