@@ -1,7 +1,7 @@
 library(gtranslate)
 
 df <- read_parquet("data/recette.parquet")
-df_comment <- df[,c(1,3,10,11)] |> unnest("comment")
+df_comment <- df[,c(1,3,10,11,12,13)] |> unnest("comment")
 
 comment_en = list()
 
