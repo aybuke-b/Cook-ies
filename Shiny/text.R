@@ -1,4 +1,3 @@
-library(janeaustenr)
 library(textdata)
 library(tidyverse)
 library(tidytext)
@@ -9,6 +8,24 @@ library(gutenbergr)
 library(FactoMineR)
 library(janitor)
 library(arrow)
+
+iso3 <- data.frame(
+  pays = c(
+    "allemagne", "autriche", "belgique", "bulgarie", "crete", "croatie", "espagne", "grece", "hongrie",
+    "irlandaises", "italie", "lituanie", "norvegiennes", "pologne", "portugal", "roumanie", "royaume-uni",
+    "suede", "suisse", "turquie", "azerbaidjan", "chine", "coreennes", "inde", "israel", "japon", "laos",
+    "libanaises", "russie", "thailande", "vietnamiennes", "etats-unis", "canada", "caraibes", "cubaines",
+    "mexique", "argentine", "bresil", "chili", "perou", "venezuela", "africaines", "afrique-du-sud", "algerie",
+    "benin", "cameroun", "cote-ivoire", "ile-maurice", "maroc", "senegal", "tunisie", "australie", "indonesiennes",
+    "nouvelle-zelande", "guadeloupe", "guyane", "martinique", "nouvelle-caledonie", "reunion", "tahiti"
+  ),
+  iso_alpha3 = c(
+    "DEU", "AUT", "BEL", "BGR", "GRC", "HRV", "ESP", "GRC", "HUN", "IRL", "ITA", "LTU", "NOR", "POL", "PRT",
+    "ROU", "GBR", "SWE", "CHE", "TUR", "AZE", "CHN", "KOR", "IND", "ISR", "JPN", "LAO", "LBN", "RUS", "THA",
+    "VNM", "USA", "CAN", "CUB", "CUB", "MEX", "ARG", "BRA", "CHL", "PER", "VEN", "AFG", "ZAF", "DZA", "BEN",
+    "CMR", "CIV", "MUS", "MAR", "SEN", "TUN", "AUS", "IDN", "NZL", "GLP", "GUF", "MTQ", "NCL", "REU", "PYF"
+  )
+)
 
 df <- read.csv("data/comment_en.csv",
                sep = ",",
@@ -35,7 +52,29 @@ score_bing <- df |> select("comment_en", "nom", "pays") |>
     negative = sum(sentiment == "negative"))
 
 score_bing <- score_bing |> 
-  mutate(ratio = positive / (negative + positive)) 
+  mutate(ratio = positive / (negative + positive))  
+
+df_bing <- merge(score_bing, iso3, by = "pays", all.x = TRUE)
+
+df_bing_gb <- merge(score_bing, iso3, by = "pays", all.x = TRUE) |> 
+  group_by(pays, iso_alpha3) |> 
+  summarise(mean_ration = mean(ratio))
+
+g <- list(
+  lonaxis = list(showgrid = T),
+  lataxis = list(showgrid = T),
+  showland = TRUE,
+  landcolor = toRGB("#e5ecf6")
+)
+
+fig <- plot_ly(df_bing_gb, type='choropleth',
+        locations=df_bing_gb$iso_alpha3,
+        z=df_bing_gb$mean_ration,
+        text=df_bing_gb$pays,
+        colorscale="Blues")
+
+fig <- fig %>% layout(geo = g)
+fig
 
 liste_pays <- score_bing |> 
   count(pays) |>
