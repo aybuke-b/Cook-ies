@@ -112,9 +112,50 @@ server <- function(input, output) {
             colorscale="Blues")
   })
   
-}
 
 #----------------------------VALUE BOX----------------------------# 
 
-
+  output$nb_recette <- renderText({
+    ifelse(input$select_all,
+    df |> nrow() ,
+    nb <- df |> 
+      filter(pays %in% input$select_pays) |> 
+      filter(niveau %in% input$select_niveau) |> 
+      filter(temps < input$select_temps) |> 
+      nrow())  
+  })
+  
+  output$nb_pays <- renderText({
+    ifelse(input$select_all,
+    nb <- df,
+    nb <- df |> 
+      filter(pays %in% input$select_pays) |> 
+      filter(niveau %in% input$select_niveau) |> 
+      filter(temps < input$select_temps)) 
+    
+    length(unique(nb$pays))
+  })
+  
+  output$cout_recette <- renderText({
+    ifelse(input$select_all,
+    nb <- df,
+    nb <- df |> 
+      filter(pays %in% input$select_pays) |> 
+      filter(niveau %in% input$select_niveau) |> 
+      filter(temps < input$select_temps))  
+    
+    round(mean(nb$cout),3)
+  })
+  
+  output$tps_recette <- renderText({
+    ifelse(input$select_all,
+    nb <- df,
+    nb <- df |> 
+      filter(pays %in% input$select_pays) |> 
+      filter(niveau %in% input$select_niveau) |> 
+      filter(temps < input$select_temps))  
+    
+    round(mean(nb$temps),3)
+  })
+}
   

@@ -34,13 +34,25 @@ df <- read.csv("data/comment_en.csv",
 df <- df[,-c(3)]
 
 ## SENTIMENT
+df |> select("comment_en", "nom", "pays") |>
+  unnest_tokens(word,comment_en) |> 
+  inner_join(get_sentiments("afinn")) |> 
+  group_by(nom, pays) |> 
+  mutate(nb_comment = n()) |> 
+  group_by(nom,nb_comment, pays) |>
+  summarise(sentiment = sum(value)) |> 
+  mutate(note = sentiment/nb_comment)
 
 ### afinn
-score_afinn <- df |> select("comment_en", "nom") |>
+score_afinn <- df |> 
+  select("comment_en", "nom", "pays") |>
   unnest_tokens(word,comment_en) |> 
-  inner_join(get_sentiments("afinn")) |>
-  group_by(nom) |>
-  summarise(sentiment = sum(value))
+  inner_join(get_sentiments("afinn")) |> 
+  group_by(nom, pays) |> 
+  mutate(nb_comment = n()) |> 
+  group_by(nom,nb_comment, pays) |>
+  summarise(sentiment = sum(value)) |> 
+  mutate(note = sentiment/nb_comment)
 
 ### bing
 score_bing <- df |> select("comment_en", "nom", "pays") |>
@@ -49,9 +61,7 @@ score_bing <- df |> select("comment_en", "nom", "pays") |>
   group_by(nom, pays) |> 
   summarise(
     positive = sum(sentiment == "positive"),
-    negative = sum(sentiment == "negative"))
-
-score_bing <- score_bing |> 
+    negative = sum(sentiment == "negative")) |> 
   mutate(ratio = positive / (negative + positive))  
 
 df_bing <- merge(score_bing, iso3, by = "pays", all.x = TRUE)
@@ -223,3 +233,41 @@ plot(res_lexCA,
      title = "Représentation graphique des mots",
      col.word = "orange",
      col.doc = "royalblue")
+
+#######################NOTE####################""
+### afinn
+score_afinn <- df |> 
+  select("comment_en", "nom", "pays") |>
+  unnest_tokens(word,comment_en) |> 
+  inner_join(get_sentiments("afinn")) |> 
+  group_by(nom, pays) |> 
+  mutate(nb_comment = n()) |> 
+  group_by(nom, nb_comment, pays) |>
+  summarise(sentiment = sum(value)) |> 
+  mutate(note_afinn = sentiment/nb_comment)
+
+### bing
+score_bing <- df |> select("comment_en", "nom", "pays") |>
+  unnest_tokens(word,comment_en) |> 
+  inner_join(get_sentiments("bing")) |> 
+  group_by(nom, pays) |> 
+  summarise(
+    positive = sum(sentiment == "positive"),
+    negative = sum(sentiment == "negative")) |> 
+  mutate(note_bing = positive / (negative + positive))  
+
+max_bing <- max(score_bing$note_bing)
+min_bing <- min(score_bing$note_bing)
+
+max_afinn <- max(score_afinn$note_afinn)
+min_afinn <- min(score_afinn$note_afinn)
+
+score <- merge(score_afinn, score_bing, on = "nom") |> 
+  select("nom", "pays","nb_comment", "note_afinn", "note_bing") |> 
+  mutate(note = 5*((note_afinn-min_afinn)/(max_afinn - min_afinn) + (note_bing-min_bing)/(max_bing - min_bing))/2) |> 
+  filter(nb_comment > 5)
+
+score |> 
+  ggplot()+
+  aes(x = note)+
+  geom_density()

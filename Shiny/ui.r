@@ -12,7 +12,7 @@ library(bsicons)
 path <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/")
 source(paste0(path, "server.R"))
 
-df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.parquet")
+df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
 
 df$temps <- round(df$temps,2)
 
@@ -71,26 +71,26 @@ ui <- page_navbar(
     layout_columns(
       value_box(
         title = "Nombre total de recettes",
-        value =  nrow(df),
+        value =  textOutput("nb_recette"),
         showcase = bs_icon("cookie"),
         theme = value_box_theme(bg = "#e6f2fd", fg = "#2b3254")
       ),
       value_box(
         title = "Nombre de pays",
-        value = length(unique(df$pays)),
+        value = textOutput("nb_pays"),
         showcase = bs_icon("geo"),
         theme = value_box_theme(bg = "#e6f2fd", fg = "#0B538E"))
       ),
       layout_columns(
       value_box(
         title = "Coût moyen par recette",
-        value = round(mean(df$cout),3), "€/pers",
+        value = textOutput("cout_recette"), "€/pers",
         showcase = bs_icon("cash-stack"),
         theme = value_box_theme(bg = "#e6f2fd", fg = "#0B538E" )
       ),
       value_box(
         title = "Temps moyen par recette",
-        value = round(mean(df$temps),3),
+        value = textOutput("tps_recette"),
         showcase = bs_icon("clock-history"),
         theme = value_box_theme(bg = "#e6f2fd", fg = "#2b3254")
       )
@@ -115,6 +115,11 @@ ui <- page_navbar(
     card(
       card_header("Map"),
       plotlyOutput("map_monde")
+    )
+  ),
+  nav_panel(
+    title = "Note ⭐",
+    card(
     )
   ),
   nav_spacer(),
