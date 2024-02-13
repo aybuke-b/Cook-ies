@@ -9,11 +9,15 @@ library(shinythemes)
 library(fontawesome)
 library(bsicons)
 
+
+
+
+
 path <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/")
 source(paste0(path, "server.R"))
 
-df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
-
+#df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
+df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.parquet")
 df$temps <- round(df$temps,2)
 
 title_css <- ".title { font-family: 'Satisfy', cursive; font-weight: bold; }"
@@ -43,7 +47,7 @@ ui <- page_navbar(
       "Pays",
       choices = unique(df$pays),
       multiple = TRUE,
-      selected = "espagne"
+      selected = "Espagne"
     ),
     sliderInput(
       "select_temps",

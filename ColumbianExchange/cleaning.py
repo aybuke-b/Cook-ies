@@ -59,6 +59,7 @@ def clean_pays2(df : pl.DataFrame) -> pl.DataFrame:
         .str.replace("indonesiennes", "indonesie")
         .str.replace("vietnamiennes", "vietnam")
         .str.replace("coreennes", "corée du sud")
+        .str_replace("cubaines", "cuba")
         .str.to_titlecase()
     )
     return df
@@ -111,7 +112,7 @@ def add_iso_code(df: pl.DataFrame) -> pl.DataFrame:
         .when(pl.col("pays") == "Chine")
         .then(pl.lit("CN"))
         .when(pl.col("pays") == "Coree du Sud")
-        .then(pl.lit("KP"))
+        .then(pl.lit("KR"))
         .when(pl.col("pays") == "Inde")
         .then(pl.lit("IN"))
         .when(pl.col("pays") == "Israel")
