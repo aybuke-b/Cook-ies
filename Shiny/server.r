@@ -26,13 +26,12 @@ server <- function(input, output) {
 #----------------------------TABLE----------------------------# 
   output$table_recette <- render_gt({
     ifelse(input$select_all,
-      df_rec <- df[,c("img", "nom","pays", "niveau", "temps", "cout")],
-      df_rec <- df[,c("img", "nom","pays", "niveau", "temps", "cout")] |> 
+      df_rec <- df[,c("img", "nom","pays", "niveau", "temps", "cout","ISO2")],
+      df_rec <- df[,c("img", "nom","pays", "niveau", "temps", "cout","ISO2")] |> 
         filter(pays %in% input$select_pays) |> 
         filter(niveau %in% input$select_niveau) |> 
         filter(temps < input$select_temps))
     
-    df_rec$flag <- sapply(df_rec$pays, get_flag_url)
     
     df_rec |> 
         gt() |> 
@@ -47,9 +46,9 @@ server <- function(input, output) {
               }
             ) |> 
       fmt_integer() |>
-      fmt_flag(columns = flag) |>
+      fmt_flag(columns = ISO2) |>
       cols_merge(
-        columns = c(pays, flag),
+        columns = c(pays, ISO2),
         pattern = "{2} {1}"
       ) |>
           tab_header("Recettes 🥣") |>
