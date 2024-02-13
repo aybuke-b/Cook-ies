@@ -64,27 +64,6 @@ score_bing <- df |> select("comment_en", "nom", "pays") |>
     negative = sum(sentiment == "negative")) |> 
   mutate(ratio = positive / (negative + positive))  
 
-df_bing <- merge(score_bing, iso3, by = "pays", all.x = TRUE)
-
-df_bing_gb <- merge(score_bing, iso3, by = "pays", all.x = TRUE) |> 
-  group_by(pays, iso_alpha3) |> 
-  summarise(mean_ration = mean(ratio))
-
-g <- list(
-  lonaxis = list(showgrid = T),
-  lataxis = list(showgrid = T),
-  showland = TRUE,
-  landcolor = toRGB("#e5ecf6")
-)
-
-fig <- plot_ly(df_bing_gb, type='choropleth',
-        locations=df_bing_gb$iso_alpha3,
-        z=df_bing_gb$mean_ration,
-        text=df_bing_gb$pays,
-        colorscale="Blues")
-
-fig <- fig %>% layout(geo = g)
-fig
 
 liste_pays <- score_bing |> 
   count(pays) |>
@@ -121,10 +100,16 @@ bing_count <- df |> select("comment_en", "nom") |>
   inner_join(get_sentiments("bing")) |> 
   count(word, sentiment, sort = TRUE)
 
+my_stop_words <- tibble(
+  word = c("lemon"),
+  lexicon = "autres"
+)
+
 bing_count |> 
   group_by(sentiment) |> 
+  anti_join(bind_rows(get_stopwords("en"), my_stop_words),
+            by = "word") |> 
   top_n(10) |> 
-  ungroup() |> 
   ggplot(aes(x = reorder(word, n), y = n)) + 
   geom_col(fill = "royalblue", alpha = 0.35) +
   facet_wrap(~sentiment, nrow= 1, scale = "free") + 
@@ -262,6 +247,7 @@ min_bing <- min(score_bing$note_bing)
 max_afinn <- max(score_afinn$note_afinn)
 min_afinn <- min(score_afinn$note_afinn)
 
+
 score <- merge(score_afinn, score_bing, on = "nom") |> 
   select("nom", "pays","nb_comment", "note_afinn", "note_bing") |> 
   mutate(note = 5*((note_afinn-min_afinn)/(max_afinn - min_afinn) + (note_bing-min_bing)/(max_bing - min_bing))/2) |> 
@@ -270,4 +256,38 @@ score <- merge(score_afinn, score_bing, on = "nom") |>
 score |> 
   ggplot()+
   aes(x = note)+
-  geom_density()
+  geom_histogram(aes(y=..density..), alpha=0.1,
+                 fill = "darkblue", bins = 50)+
+  geom_density(fill = "royalblue",
+               alpha = 0.25)+
+  theme_minimal() +
+  labs(x = "Note", y = "Densité", 
+       title = "Répartition des notes")+
+  geom_vline(aes(xintercept=mean(note),
+                 color="red"),
+             linetype="dashed")+
+  theme(legend.position = "None")
+
+score_pays <- score |> 
+  group_by(pays) |> 
+  summarise(note = mean(note),
+            nb_comment = sum(nb_comment),
+            nb_recette = n())
+
+score_pays |> 
+  filter(nb_recette > 5) |> 
+  top_n(15) |> 
+  ggplot(aes(y = note,
+             x = fct_reorder(pays, note)))+
+  geom_col(fill = "royalblue", alpha = 0.80,
+           color = "royalblue", width = 0.75)+
+  coord_flip()+
+  theme_minimal()+
+  labs(x = "Note",
+       y = "",
+       title = "Note par pays")+
+  geom_hline(aes(yintercept=mean(note)),
+             linetype="dashed",
+             size=1.2,
+             color="darkblue")
+

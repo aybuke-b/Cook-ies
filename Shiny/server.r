@@ -8,6 +8,43 @@ library(plotly)
 library(fontawesome)
 library(bslib)
 
+score_afinn <- df_comment |> 
+  select("comment_en", "nom", "pays") |>
+  unnest_tokens(word,comment_en) |> 
+  inner_join(get_sentiments("afinn")) |> 
+  group_by(nom, pays) |> 
+  mutate(nb_comment = n()) |> 
+  group_by(nom, nb_comment, pays) |>
+  summarise(sentiment = sum(value)) |> 
+  mutate(note_afinn = sentiment/nb_comment)
+
+score_bing <- df_comment |> select("comment_en", "nom", "pays") |>
+  unnest_tokens(word,comment_en) |> 
+  inner_join(get_sentiments("bing")) |> 
+  group_by(nom, pays) |> 
+  summarise(
+    positive = sum(sentiment == "positive"),
+    negative = sum(sentiment == "negative")) |> 
+  mutate(note_bing = positive / (negative + positive)) 
+
+max_bing <- max(score_bing$note_bing)
+min_bing <- min(score_bing$note_bing)
+
+max_afinn <- max(score_afinn$note_afinn)
+min_afinn <- min(score_afinn$note_afinn)
+
+score <- merge(score_afinn, score_bing, on = "nom") |> 
+  select("nom", "pays","nb_comment", "note_afinn", "note_bing") |> 
+  mutate(note = 5*((note_afinn-min_afinn)/(max_afinn - min_afinn) + (note_bing-min_bing)/(max_bing - min_bing))/2) |> 
+  filter(nb_comment > 5)
+
+score_pays <- score |> 
+  group_by(pays) |> 
+  summarise(note = mean(note),
+            nb_comment = sum(nb_comment),
+            nb_recette = n())
+
+df_merge <- merge(df, score, by = "nom", all = TRUE, suffixes = c("",".y"))
 
 server <- function(input, output) {
 #----------------------------PLOT----------------------------#
@@ -23,17 +60,83 @@ server <- function(input, output) {
 
     })
     
+#----------------------------PLOT-NOTE-----------------------#
+    output$plot_words <- renderPlot({
+      bing_count <- df_comment |> 
+        select("comment_en", "nom") |>
+        unnest_tokens(word,comment_en) |> 
+        inner_join(get_sentiments("bing")) |> 
+        count(word, sentiment, sort = TRUE)
+      
+      my_stop_words <- tibble(
+        word = c("lemon"),
+        lexicon = "autres"
+      )
+      
+      bing_count |> 
+        group_by(sentiment) |> 
+        anti_join(bind_rows(get_stopwords("en"), my_stop_words),
+                  by = "word") |> 
+        top_n(10) |> 
+        ggplot(aes(x = reorder(word, n), y = n)) + 
+        geom_col(fill = "royalblue", alpha = 0.35) +
+        facet_wrap(~sentiment, nrow= 1, scale = "free") + 
+        coord_flip()+
+        labs(x = "word")+
+        theme_minimal()
+      
+    })
+    
+    output$plot_by_note <- renderPlot({
+      score |> 
+        ggplot()+
+        aes(x = note)+
+        geom_histogram(aes(y=..density..), alpha=0.1,
+                       fill = "darkblue", bins = 50)+
+        geom_density(fill = "royalblue",
+                     alpha = 0.25)+
+        theme_minimal() +
+        labs(x = "Note", y = "Densité", 
+             title = "Répartition des notes")+
+        geom_vline(aes(xintercept=mean(note),
+                       color="red"),
+                   linetype="dashed")+
+        theme(legend.position = "None")
+    })
+    
+    output$plot_note_pays <- renderPlot({
+      score_pays |> 
+        filter(nb_recette > 5) |> 
+        top_n(10) |> 
+        ggplot(aes(y = note,
+                   x = fct_reorder(pays, note)))+
+        geom_col(fill = "royalblue", alpha = 0.25,
+                 color = "royalblue", width = 0.75)+
+        coord_flip()+
+        theme_minimal()+
+        labs(x = "Note",
+             y = "",
+             title = "Note par pays")+
+        geom_hline(aes(yintercept=mean(note)),
+                   linetype="dashed",
+                   size=1.2,
+                   color="darkblue")
+    })
 #----------------------------TABLE----------------------------# 
   output$table_recette <- render_gt({
     ifelse(input$select_all,
-      df_rec <- df[,c("img", "nom","pays", "niveau", "temps", "cout","ISO2")],
-      df_rec <- df[,c("img", "nom","pays", "niveau", "temps", "cout","ISO2")] |> 
+      df_rec <- df_merge[,c("img", "nom","pays", "niveau", "temps", "cout","ISO2", "note")],
+      df_rec <- df_merge[,c("img", "nom","pays", "niveau", "temps", "cout","ISO2", "note")] |> 
         filter(pays %in% input$select_pays) |> 
         filter(niveau %in% input$select_niveau) |> 
         filter(temps < input$select_temps))
     
     
     df_rec |> 
+     # mutate(note = case_when(
+     #   note %% 1 == 0 ~ strrep("star,", note),
+     #   note %% 1 != 0 ~ paste0(strrep("star,", floor(note)), "star-half")
+     # )) |> 
         gt() |> 
           opt_interactive(use_compact_mode = TRUE) |> 
           text_transform(
@@ -58,7 +161,13 @@ server <- function(input, output) {
             pays = html(fontawesome::fa("globe"),"Pays"),
             niveau = html(fontawesome::fa("layer-group"),"Niveau"),
             temps = html(fontawesome::fa("clock"),"Temps"),
-            cout = html(fontawesome::fa("sack-dollar"),"Coût/pers")) 
+            cout = html(fontawesome::fa("sack-dollar"),"Coût/pers"),
+            note = html(fontawesome::fa("star"),"Note")) #|> 
+      #fmt_icon(
+      #  columns = note,
+      #  fill_color = "red",
+      #  fill_alpha = from_column("note", fn = function(x) x )
+      #)
   })
 #----------------------------TABLE----------------------------#  
   output$map_monde <- renderPlotly({
@@ -119,5 +228,8 @@ server <- function(input, output) {
     
     round(mean(nb$temps),3)
   })
+  
+#----------------------------TEXTE----------------------------# 
+
 }
   

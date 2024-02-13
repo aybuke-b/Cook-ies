@@ -8,16 +8,23 @@ library(shinydashboard)
 library(shinythemes)
 library(fontawesome)
 library(bsicons)
-
-
-
-
+library(textdata)
+library(tidyverse)
+library(tidytext)
+library(Xplortext)
+library(wordcloud)
+library(gutenbergr)
+library(FactoMineR)
+library(janitor)
+library(arrow)
 
 path <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/")
-source(paste0(path, "server.R"))
+#source(paste0(path, "server.R"))
 
-#df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
-df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.parquet")
+df_comment <- read.csv("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
+df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
+#df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.parquet")
+
 df$temps <- round(df$temps,2)
 
 title_css <- ".title { font-family: 'Satisfy', cursive; font-weight: bold; }"
@@ -124,6 +131,11 @@ ui <- page_navbar(
   nav_panel(
     title = "Note ⭐",
     card(
+      layout_columns(card(card_header("Comment est calculé la note ?"), p(
+        "
+La note est constituée de deux composantes principales. La première est un ratio qui évalue la proportion d'adjectifs positifs par rapport au nombre total d'adjectifs. La seconde composante est basée sur la méthode Afinn, qui attribue un score à chaque adjectif. Pour chaque recette, on calcule la somme de tous les scores des adjectifs, que l'on divise ensuite par le nombre de commentaires. Ensuite, nous standardisons indépendamment les deux composantes en les centrant et les réduisant, en leur attribuant chacune un poids de un demi. Enfin, nous multiplions les deux valeurs pour obtenir une note comprise entre 0 et 5."
+      )), card(plotOutput("plot_words"))),
+      layout_columns(card(plotOutput("plot_by_note")), card(plotOutput("plot_note_pays")))
     )
   ),
   nav_spacer(),
