@@ -230,6 +230,36 @@ server <- function(input, output) {
   })
   
 #----------------------------TEXTE----------------------------# 
-
-}
   
+  output$titre <- renderUI({
+    h1(input$select_recette)
+  })
+  
+  output$details_ing <- renderUI({
+    recette <- df[df$nom == input$select_recette, ]
+    ingredients <- unlist(recette$ingredient_nom)
+    quantites <- unlist(recette$ingredient_qte)
+    details <- tagList(
+      tags$ul(
+        lapply(seq_along(ingredients), function(i) {
+          tags$li(paste(ingredients[i], " : ", quantites[i]))
+        })
+      )
+    )
+    return(details)
+  })
+
+  output$details_recette <- renderUI({
+    recette <- df[df$nom == input$select_recette, ]
+    etapes <- unlist(recette$recette)
+    details <- tagList(
+      tags$ul(
+        lapply(etapes, function(etape) {
+          tags$li(etape)
+        })
+      )
+    )
+    return(details)
+  })
+  
+}
