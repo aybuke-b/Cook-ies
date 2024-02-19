@@ -7,6 +7,7 @@ library(shinydashboard)
 library(plotly)
 library(fontawesome)
 library(bslib)
+library(gtExtras)
 
 score_afinn <- df_comment |> 
   select("comment_en", "nom", "pays") |>
@@ -133,10 +134,6 @@ server <- function(input, output) {
     
     
     df_rec |> 
-     # mutate(note = case_when(
-     #   note %% 1 == 0 ~ strrep("star,", note),
-     #   note %% 1 != 0 ~ paste0(strrep("star,", floor(note)), "star-half")
-     # )) |> 
         gt() |> 
           opt_interactive(use_compact_mode = TRUE) |> 
           text_transform(
@@ -162,12 +159,8 @@ server <- function(input, output) {
             niveau = html(fontawesome::fa("layer-group"),"Niveau"),
             temps = html(fontawesome::fa("clock"),"Temps"),
             cout = html(fontawesome::fa("sack-dollar"),"Coût/pers"),
-            note = html(fontawesome::fa("star"),"Note")) #|> 
-      #fmt_icon(
-      #  columns = note,
-      #  fill_color = "red",
-      #  fill_alpha = from_column("note", fn = function(x) x )
-      #)
+            note = html(fontawesome::fa("star"),"Note")) |> 
+      gt_fa_rating(note, icon = html(fontawesome::fa("fa-star")))
   })
 #----------------------------TABLE----------------------------#  
   output$map_monde <- renderPlotly({
