@@ -161,7 +161,7 @@ server <- function(input, output) {
             temps = html(fontawesome::fa("clock"),"Temps"),
             cout = html(fontawesome::fa("sack-dollar"),"Coût/pers"),
             note = html(fontawesome::fa("star"),"Note")) |> 
-      gt_fa_rating(note, icon = "star") 
+      gt_fa_rating(note, icon = "star", color = "gold") 
   })
 #----------------------------TABLE----------------------------#  
   output$map_monde <- renderPlotly({
