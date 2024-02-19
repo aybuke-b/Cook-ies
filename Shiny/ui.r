@@ -44,10 +44,11 @@ custom_theme <- bs_theme(
 
 test <- bs_add_rules(custom_theme, title_css)
 
+color_bg <- "#2c4263"
 
 ui <- page_navbar(
   theme = test,
-  bg = "#e7eef2",
+    bg = alpha(color_bg, 0.9), #2c4263
   title = span(class = "title", img(src = "logo2.png", height = 90), "Cook'ies"),
   sidebar = sidebar(
     checkboxInput("select_all", "Tout cocher", value = FALSE),
@@ -81,11 +82,11 @@ ui <- page_navbar(
       card_header("Bienvenue sur Cook'ies 🍪"),
       markdown("**Cook'ies**, une application qui vous ouvre les portes des saveurs du monde entier 🌍 et vous aide à perfectionner vos talents culinaires en choisissant parmi les recettes les plus appréciés par les utilisateurs, vous permettant ainsi de devenir de véritables chefs cuisiniers 👩🏻‍🍳. Cette application innovante vous permet d'explorer des recettes notées à l'aide d'un système révolutionnaire de text mining , basé sur les commentaires des utilisateurs."),
       markdown("Vous trouverez différents onglets dont:"),
-      markdown("- Recette 🍽 : permet de consulter une liste de recette qui correspondra aux caractéristiques que vous aurez chosis dans la sidebar. 
+      markdown("- Recette 🍽 : Vous donne accès à une liste de recettes correspondant aux critères que vous aurez sélectionnés dans la sidebar. 😋 
                \n 
                - Détail Recette 🧾: Découvrez les secrets de chaque recette pour maîtriser la préparation de vos plats favoris. 🥧
                \n
-               - Note ⭐ :"),
+               - Note ⭐ : Découvrez comment la note a été calculée en se basant sur les commentaires des utilisateurs."   ),
     ), 
     layout_columns(
       value_box(
