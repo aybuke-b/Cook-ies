@@ -62,6 +62,22 @@ server <- function(input, output) {
 
     })
     
+    output$plot_pays <- renderPlotly({
+      ifelse(input$select_all,
+             df_plot <- df_merge,
+             df_plot <- df_merge |> 
+               filter(pays %in% input$select_pays) |> 
+               filter(niveau %in% input$select_niveau) |> 
+               filter(temps < input$select_temps))
+      
+      df_plot <- df_plot |> 
+        group_by(pays) |> 
+        summarise(pays_n = n()) |> 
+        top_n(10)
+      
+        plot_ly(x = df_plot$pays_n, y = df_plot$pays, type = "bar")
+    })
+    
 #----------------------------PLOT-NOTE-----------------------#
     output$plot_words <- renderPlot({
       bing_count <- df_comment |> 
@@ -124,6 +140,7 @@ server <- function(input, output) {
                    size=1.2,
                    color="darkblue")
     })
+    
 #----------------------------TABLE----------------------------# 
   output$table_recette <- render_gt({
     ifelse(input$select_all,
