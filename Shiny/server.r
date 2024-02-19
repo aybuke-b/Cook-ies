@@ -45,7 +45,8 @@ score_pays <- score |>
             nb_comment = sum(nb_comment),
             nb_recette = n())
 
-df_merge <- merge(df, score, by = "nom", all = TRUE, suffixes = c("",".y"))
+#df_merge <- merge(df, score, by = "nom", all = TRUE, suffixes = c("",".y"))
+df_merge <- left_join(df, score, by = c("nom" = "nom", "pays" = "pays"))
 
 server <- function(input, output) {
 #----------------------------PLOT----------------------------#
@@ -160,7 +161,7 @@ server <- function(input, output) {
             temps = html(fontawesome::fa("clock"),"Temps"),
             cout = html(fontawesome::fa("sack-dollar"),"Coût/pers"),
             note = html(fontawesome::fa("star"),"Note")) |> 
-      gt_fa_rating(note, icon = html(fontawesome::fa("fa-star")))
+      gt_fa_rating(note, icon = "star") 
   })
 #----------------------------TABLE----------------------------#  
   output$map_monde <- renderPlotly({

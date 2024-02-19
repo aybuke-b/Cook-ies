@@ -79,7 +79,13 @@ ui <- page_navbar(
     title = "Accueil 🏠︎",
     card(
       card_header("Bienvenue sur Cook'ies 🍪"),
-      p("Test")
+      markdown("**Cook'ies**, une application qui vous ouvre les portes des saveurs du monde entier 🌍 et vous aide à perfectionner vos talents culinaires en choisissant parmi les recettes les plus appréciés par les utilisateurs, vous permettant ainsi de devenir de véritables chefs cuisiniers 👩🏻‍🍳. Cette application innovante vous permet d'explorer des recettes notées à l'aide d'un système révolutionnaire de text mining , basé sur les commentaires des utilisateurs."),
+      markdown("Vous trouverez différents onglets dont:"),
+      markdown("- Recette 🍽 : permet de consulter une liste de recette qui correspondra aux caractéristiques que vous aurez chosis dans la sidebar. 
+               \n 
+               - Détail Recette 🧾: Découvrez les secrets de chaque recette pour maîtriser la préparation de vos plats favoris. 🥧
+               \n
+               - Note ⭐ :"),
     ), 
     layout_columns(
       value_box(
