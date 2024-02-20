@@ -134,6 +134,7 @@ ui <- page_navbar(
     ),
     card(
       uiOutput("titre"),
+      uiOutput("img_recette"),
       HTML("<h3>INGRÉDIENTS :</h3>"),
       uiOutput("details_ing"),
       HTML("<h3>PRÉPARATION :</h3>"),

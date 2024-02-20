@@ -241,7 +241,6 @@ server <- function(input, output) {
   })
   
 #----------------------------TEXTE----------------------------# 
-  
   output$titre <- renderUI({
     h1(input$select_recette)
   })
@@ -273,4 +272,17 @@ server <- function(input, output) {
     return(details)
   })
   
+  
+  output$img_recette <- renderUI({
+    recette <- df[df$nom == input$select_recette, ]
+    img_url <- recette$img
+    
+    if (is.null(img_url)) {
+      return(NULL)
+    }
+    
+    img_tag <- tags$img(src = img_url, style = "max-width:30%; height:auto;")
+    centered_img <- tags$div(style = "text-align:center;", img_tag)
+    return(centered_img)
+  })
 }
