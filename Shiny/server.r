@@ -48,6 +48,13 @@ score_pays <- score |>
 #df_merge <- merge(df, score, by = "nom", all = TRUE, suffixes = c("",".y"))
 df_merge <- left_join(df, score, by = c("nom" = "nom", "pays" = "pays"))
 
+df_merge <- df_merge %>%
+  mutate(
+    heures = floor(temps),
+    minutes = round((temps - heures) * 60, 0),
+    heures_minute = paste(heures, "h", minutes, "min")
+  )
+
 server <- function(input, output) {
 #----------------------------PLOT----------------------------#
     output$plot_cout <- renderPlotly({
@@ -58,7 +65,8 @@ server <- function(input, output) {
             filter(niveau %in% input$select_niveau) |> 
             filter(temps < input$select_temps))
           
-            plot_ly(x = df_plot$cout, type = "histogram")
+            plot_ly(x = df_plot$cout, type = "histogram")|> 
+              layout(title = 'Répartition des coûts', plot_bgcolor = "#e5ecf6")
 
     })
     
@@ -75,7 +83,10 @@ server <- function(input, output) {
         summarise(pays_n = n()) |> 
         top_n(10)
       
-        plot_ly(x = df_plot$pays_n, y = df_plot$pays, type = "bar")
+      df_plot$pays <- factor(df_plot$pays, levels = unique(df_plot$pays)[order(df_plot$pays_n, decreasing = FALSE)])
+      
+      plot_ly(x = df_plot$pays_n, y = df_plot$pays, type = "bar") |> 
+        layout(title = 'Nombre de recette par pays', plot_bgcolor = "#e5ecf6")
     })
     
 #----------------------------PLOT-NOTE-----------------------#
@@ -144,14 +155,14 @@ server <- function(input, output) {
 #----------------------------TABLE----------------------------# 
   output$table_recette <- render_gt({
     ifelse(input$select_all,
-      df_rec <- df_merge[,c("img", "nom","pays", "niveau", "temps", "cout","ISO2", "note")],
-      df_rec <- df_merge[,c("img", "nom","pays", "niveau", "temps", "cout","ISO2", "note")] |> 
+      df_rec <- df_merge[,c("img", "nom","pays", "niveau", "temps","heures_minute", "cout","ISO2", "note")],
+      df_rec <- df_merge[,c("img", "nom","pays", "niveau", "temps","heures_minute", "cout","ISO2", "note")] |> 
         filter(pays %in% input$select_pays) |> 
         filter(niveau %in% input$select_niveau) |> 
         filter(temps < input$select_temps))
     
     
-    df_rec |> 
+    df_rec[,c("img", "nom","pays", "niveau","heures_minute", "cout","ISO2", "note")] |> 
         gt() |> 
           opt_interactive(use_compact_mode = TRUE) |> 
           text_transform(
@@ -175,7 +186,7 @@ server <- function(input, output) {
             nom = html(fontawesome::fa("utensils"),"Nom"),
             pays = html(fontawesome::fa("globe"),"Pays"),
             niveau = html(fontawesome::fa("layer-group"),"Niveau"),
-            temps = html(fontawesome::fa("clock"),"Temps"),
+            heures_minute = html(fontawesome::fa("clock"),"Temps"),
             cout = html(fontawesome::fa("sack-dollar"),"Coût/pers"),
             note = html(fontawesome::fa("star"),"Note")) |> 
       gt_fa_rating(note, icon = "star", color = "gold") 
@@ -185,13 +196,30 @@ server <- function(input, output) {
 
     
     df_mc <- df |> 
+      group_by(ISO3, pays) |> summarise(mean_temps = mean(temps))
+    
+    plot_ly(df_mc, type='choropleth',
+            locations=df_mc$ISO3,
+            z=df_mc$mean_temps,
+            text=df_mc$pays,
+            colorscale="Viridis")|> 
+      layout(title = 'Temps moyens de préparation des recettes par pays',
+             showlegend = FALSE)
+  })
+  
+  output$map_monde_cout <- renderPlotly({
+    
+    
+    df_mc <- df |> 
       group_by(ISO3, pays) |> summarise(mean_cout = mean(cout))
     
     plot_ly(df_mc, type='choropleth',
             locations=df_mc$ISO3,
             z=df_mc$mean_cout,
             text=df_mc$pays,
-            colorscale="Blues")
+            colorscale="Viridis")|> 
+      layout(title = 'Coût moyens de préparation des recettes par pays',
+             showlegend = FALSE)
   })
   
 
@@ -237,7 +265,16 @@ server <- function(input, output) {
       filter(niveau %in% input$select_niveau) |> 
       filter(temps < input$select_temps))  
     
-    round(mean(nb$temps),3)
+    nb <- nb %>%
+      mutate(
+        heures = floor(temps),
+        minutes = round((temps - heures) * 60, 0),
+        heures_minute = paste(heures, "h", minutes, "min")
+      )
+    
+    moyenne_temps <- round(mean(nb$temps), 3)
+    paste(floor(moyenne_temps), "h", round((moyenne_temps - floor(moyenne_temps)) * 60, 0), "min")
+    
   })
   
 #----------------------------TEXTE----------------------------# 
