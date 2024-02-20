@@ -55,7 +55,7 @@ df_merge <- df_merge %>%
     heures_minute = paste(heures, "h", minutes, "min")
   )
 
-server <- function(input, output) {
+server <- function(input, output, session) {
 #----------------------------PLOT----------------------------#
     output$plot_cout <- renderPlotly({
       ifelse(input$select_all,
@@ -318,8 +318,19 @@ server <- function(input, output) {
       return(NULL)
     }
     
-    img_tag <- tags$img(src = img_url, style = "max-width:30%; height:auto;")
+    img_tag <- tags$img(src = img_url, style = "max-width:35%; height:auto;")
     centered_img <- tags$div(style = "text-align:center;", img_tag)
     return(centered_img)
   })
+  
+  observe({
+    df <- df |> 
+      filter(pays %in% input$select_pays) |> 
+      filter(niveau %in% input$select_niveau) |> 
+      filter(temps < input$select_temps)
+    
+    updateSelectInput(session, "select_recette",
+                      choices = unique(df$nom))
+  })
+  
 }

@@ -51,7 +51,7 @@ ui <- page_navbar(
     bg = alpha(color_bg, 0.9), #2c4263
   title = span(class = "title", img(src = "logo2.png", height = 90), "Cook'ies"),
   sidebar = sidebar(
-    checkboxInput("select_all", "Tout cocher", value = FALSE),
+    checkboxInput("select_all", "Tout sélectionner", value = FALSE),
     selectInput(
       "select_pays",
       "Pays",
@@ -65,7 +65,7 @@ ui <- page_navbar(
       min = 0,
       value = 20,
       max = max(df$temps),
-      step = 5
+      step = 1
       
     ),
     selectInput(
@@ -125,20 +125,35 @@ ui <- page_navbar(
   ),
   nav_panel(
     title = "Détail recette 📋",
-    selectInput(
-      "select_recette",
-      "Recette",
-      choices = unique(df$nom),
-      multiple = FALSE,
-      selected = "Churros"
-    ),
     card(
-      uiOutput("titre"),
-      uiOutput("img_recette"),
-      HTML("<h3>INGRÉDIENTS :</h3>"),
-      uiOutput("details_ing"),
-      HTML("<h3>PRÉPARATION :</h3>"),
-      uiOutput("details_recette")
+      #uiOutput("titre"),
+      tags$head(
+        tags$style(HTML("
+            #select_recette + .selectize-control .selectize-input {
+                font-size: 18px; /* Taille de police */
+                font-weight: bold; /* Mise en gras du contenu */
+                width: 400px; /* Largeur de la boîte de sélection */
+            }
+        "))
+      ),
+      fluidRow(
+        column(width = 5,
+          selectInput(
+          "select_recette",
+          "Sélectionnez une recette : ",
+          choices = NULL,
+          multiple = FALSE,
+          selected = "Churros")),
+        column(width = 6,
+               uiOutput("img_recette"))
+        ),
+      fluidRow(
+        column(width = 5,
+          HTML("<h3>INGRÉDIENTS :</h3>"),
+          uiOutput("details_ing")),
+      column(width = 6,
+          HTML("<h3>PRÉPARATION :</h3>"),
+          uiOutput("details_recette")))
     )
     
   ),
@@ -157,9 +172,13 @@ ui <- page_navbar(
   nav_panel(
     title = "Note ⭐",
     card(
-      layout_columns(card(card_header("Comment est calculé la note ?"), p(
-        "
-La note est constituée de deux composantes principales. La première est un ratio qui évalue la proportion d'adjectifs positifs par rapport au nombre total d'adjectifs. La seconde composante est basée sur la méthode Afinn, qui attribue un score à chaque adjectif. Pour chaque recette, on calcule la somme de tous les scores des adjectifs, que l'on divise ensuite par le nombre de commentaires. Ensuite, nous standardisons indépendamment les deux composantes en les centrant et les réduisant, en leur attribuant chacune un poids de un demi. Enfin, nous multiplions les deux valeurs pour obtenir une note comprise entre 0 et 5."
+      layout_columns(card(
+        card_header("Comment est calculé la note ?"), 
+        markdown("
+La note est constituée de deux composantes principales. \n
+- La première est un ratio qui évalue la proportion d'adjectifs positifs par rapport au nombre total d'adjectifs. \n
+- La seconde composante est basée sur la méthode Afinn, qui attribue un score à chaque adjectif. Pour chaque recette, on calcule la somme de tous les scores des adjectifs, que l'on divise ensuite par le nombre de commentaires. \n
+Ensuite, nous standardisons indépendamment les deux composantes en les centrant et les réduisant, en leur attribuant chacune un poids de un demi. Enfin, nous multiplions les deux valeurs pour obtenir une note comprise entre 0 et 5."
       )), card(plotOutput("plot_words"))),
       layout_columns(card(plotOutput("plot_by_note")), card(plotOutput("plot_note_pays")))
     )
