@@ -1,14 +1,3 @@
-library(shiny)
-library(ggplot2)
-library(tidyverse)
-library(arrow)
-library(gt)
-library(shinydashboard)
-library(plotly)
-library(fontawesome)
-library(bslib)
-library(gtExtras)
-
 score_afinn <- df_comment |> 
   select("comment_en", "nom", "pays") |>
   unnest_tokens(word,comment_en) |> 
@@ -154,12 +143,18 @@ server <- function(input, output, session) {
     
 #----------------------------TABLE----------------------------# 
   output$table_recette <- render_gt({
-    ifelse(input$select_all,
-      df_rec <- df_merge[,c("img", "nom","pays", "niveau", "temps","heures_minute", "cout","ISO2", "note")],
-      df_rec <- df_merge[,c("img", "nom","pays", "niveau", "temps","heures_minute", "cout","ISO2", "note")] |> 
-        filter(pays %in% input$select_pays) |> 
-        filter(niveau %in% input$select_niveau) |> 
-        filter(temps < input$select_temps))
+    df_rec <- df_merge[,c("img", "nom","pays", "niveau", "temps","heures_minute", "cout","ISO2", "note")]
+    
+    if (!input$select_all) {
+      df_rec <- df_rec |>
+        filter(pays %in% input$select_pays) |>
+        filter(niveau %in% input$select_niveau) |>
+        filter(temps < input$select_temps)
+    }
+    
+    if (input$only_note) {
+      df_rec <- df_rec[complete.cases(df_rec$note), ]
+    }
     
     
     df_rec[,c("img", "nom","pays", "niveau","heures_minute", "cout","ISO2", "note")] |> 
@@ -226,46 +221,62 @@ server <- function(input, output, session) {
 #----------------------------VALUE BOX----------------------------# 
 
   output$nb_recette <- renderText({
-    ifelse(input$select_all,
-    df |> nrow() ,
-    nb <- df |> 
-      filter(pays %in% input$select_pays) |> 
-      filter(niveau %in% input$select_niveau) |> 
-      filter(temps < input$select_temps) |> 
-      nrow())  
+    if (!input$select_all) {
+      df <- df_merge |>
+        filter(pays %in% input$select_pays) |>
+        filter(niveau %in% input$select_niveau) |>
+        filter(temps < input$select_temps)
+    }
+    
+    if (input$only_note) {
+      df <- df[complete.cases(df$note), ]
+    }
+    
+    df |> nrow()
   })
   
   output$nb_pays <- renderText({
-    ifelse(input$select_all,
-    nb <- df,
-    nb <- df |> 
-      filter(pays %in% input$select_pays) |> 
-      filter(niveau %in% input$select_niveau) |> 
-      filter(temps < input$select_temps)) 
+    if (!input$select_all) {
+      df <- df_merge |>
+        filter(pays %in% input$select_pays) |>
+        filter(niveau %in% input$select_niveau) |>
+        filter(temps < input$select_temps)
+    }
     
-    length(unique(nb$pays))
+    if (input$only_note) {
+      df <- df[complete.cases(df$note), ]
+    }
+    length(unique(df$pays))
   })
   
   output$cout_recette <- renderText({
-    ifelse(input$select_all,
-    nb <- df,
-    nb <- df |> 
-      filter(pays %in% input$select_pays) |> 
-      filter(niveau %in% input$select_niveau) |> 
-      filter(temps < input$select_temps))  
+    if (!input$select_all) {
+      df <- df_merge |>
+        filter(pays %in% input$select_pays) |>
+        filter(niveau %in% input$select_niveau) |>
+        filter(temps < input$select_temps)
+    }
     
-    round(mean(nb$cout),3)
+    if (input$only_note) {
+      df <- df[complete.cases(df$note), ]
+    }
+    
+    round(mean(df$cout),3)
   })
   
   output$tps_recette <- renderText({
-    ifelse(input$select_all,
-    nb <- df,
-    nb <- df |> 
-      filter(pays %in% input$select_pays) |> 
-      filter(niveau %in% input$select_niveau) |> 
-      filter(temps < input$select_temps))  
+    if (!input$select_all) {
+      df <- df_merge |>
+        filter(pays %in% input$select_pays) |>
+        filter(niveau %in% input$select_niveau) |>
+        filter(temps < input$select_temps)
+    }
     
-    nb <- nb %>%
+    if (input$only_note) {
+      df <- df[complete.cases(df$note), ]
+    }
+    
+    nb <- df %>%
       mutate(
         heures = floor(temps),
         minutes = round((temps - heures) * 60, 0),
@@ -331,6 +342,34 @@ server <- function(input, output, session) {
     
     updateSelectInput(session, "select_recette",
                       choices = unique(df$nom))
+  })
+  
+  #----------------------------CLOUD----------------------------# 
+  
+  output$plot_cloud <- renderPlot({
+    df_words <- df_comment |> 
+    mutate(niveau = as_factor(niveau),
+           pays = as_factor(pays)) |> 
+    unnest_tokens(output=words,
+                  input=comment_en,
+                  token="words") |> 
+    group_by(words) |> summarise(freq = n())
+  
+  my_stop_words <- tibble(
+    word = c("1","2", "it's", "4", "5", "3", "30", "g", "10"),
+    lexicon = "autres"
+  )
+  
+  df_words_filter <- df_words |> 
+    anti_join(bind_rows(rbind(get_stopwords("en")),my_stop_words), 
+              by = c("words"="word")) |> 
+    filter(freq >= 50)
+
+  wordcloud(words = df_words_filter$words,
+            freq = df_words_filter$freq,
+            colors = brewer.pal(8, "Dark2"),
+            random.order=FALSE,
+            rot.per=0.0) 
   })
   
 }

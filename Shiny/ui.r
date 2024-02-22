@@ -1,23 +1,3 @@
-library(shiny)
-library(arrow)
-library(ggplot2)
-library(tidyverse)
-library(bslib)
-library(DT)
-library(shinydashboard)
-library(shinythemes)
-library(fontawesome)
-library(bsicons)
-library(textdata)
-library(tidyverse)
-library(tidytext)
-library(Xplortext)
-library(wordcloud)
-library(gutenbergr)
-library(FactoMineR)
-library(janitor)
-library(arrow)
-
 path <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/")
 #source(paste0(path, "server.R"))
 
@@ -63,7 +43,7 @@ ui <- page_navbar(
       "select_temps",
       "Temps",
       min = 0,
-      value = 20,
+      value = 2,
       max = max(df$temps),
       step = 1
       
@@ -74,6 +54,10 @@ ui <- page_navbar(
       choices = unique(df$niveau),
       multiple = TRUE,
       selected = "Facile"
+    ),
+    hr(),
+    materialSwitch(inputId = 'only_note', 
+                   label = "Seulement avec note"
     )
   ),
   nav_panel(
@@ -138,12 +122,13 @@ ui <- page_navbar(
       ),
       fluidRow(
         column(width = 5,
-          selectInput(
+          selectizeInput(
           "select_recette",
-          "Sélectionnez une recette : ",
+          "Écrivez/Sélectionnez une recette : ",
           choices = NULL,
           multiple = FALSE,
-          selected = "Churros")),
+          selected = "Churros",
+          options = list(autocomplete = TRUE))),
         column(width = 6,
                uiOutput("img_recette"))
         ),
@@ -171,18 +156,21 @@ ui <- page_navbar(
   ),
   nav_panel(
     title = "Note ⭐",
-    card(
-      layout_columns(card(
-        card_header("Comment est calculé la note ?"), 
+        layout_columns(card(
+        card_header("Une note basé sur les commentaires des utilisateurs ? 🤔"), 
         markdown("
-La note est constituée de deux composantes principales. \n
-- La première est un ratio qui évalue la proportion d'adjectifs positifs par rapport au nombre total d'adjectifs. \n
-- La seconde composante est basée sur la méthode Afinn, qui attribue un score à chaque adjectif. Pour chaque recette, on calcule la somme de tous les scores des adjectifs, que l'on divise ensuite par le nombre de commentaires. \n
-Ensuite, nous standardisons indépendamment les deux composantes en les centrant et les réduisant, en leur attribuant chacune un poids de un demi. Enfin, nous multiplions les deux valeurs pour obtenir une note comprise entre 0 et 5."
-      )), card(plotOutput("plot_words"))),
-      layout_columns(card(plotOutput("plot_by_note")), card(plotOutput("plot_note_pays")))
-    )
-  ),
+La note repose sur **deux éléments**. Un ratio évaluant la proportion d'adjectifs positifs parmi tous les adjectifs 1️⃣.
+Une évaluation basée sur [la mtéhode Afinn](http://corpustext.com/reference/sentiment_afinn.html) qui attribue un score à chaque adjectif. Pour chaque recette, on calcule la somme des scores des adjectifs, puis on divise cette somme par le nombre de commentaires 2️⃣.
+Les deux composantes sont standardisées séparément en utilisant un centrage et une réduction. Chacune des composantes a un poids de un demi et est multipliée par 5. On les additionne et on obtient alors la note entre **0 et 5**."
+      ))),
+      layout_columns(
+        navset_card_underline(
+          nav_panel("Répartition note", plotOutput("plot_by_note")),
+          nav_panel("Top 10 pays", plotOutput("plot_note_pays"))),
+        navset_card_underline(
+          nav_panel("Adjectif positif et négatif", plotOutput("plot_words")),
+          nav_panel("Nuage de mots", plotOutput("plot_cloud")))
+    )),
   nav_spacer(),
   nav_menu(
     title = "Links",

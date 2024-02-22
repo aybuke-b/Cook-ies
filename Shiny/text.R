@@ -139,7 +139,7 @@ nrc_count |>
 
 #score = merge(score_afinn, score_bing[,-c(2,3)], by = "nom")
 
-df_words <- df |> 
+df_words <- df_comment |> 
   mutate(niveau = as_factor(niveau),
          pays = as_factor(pays)) |> 
   unnest_tokens(output=words,
