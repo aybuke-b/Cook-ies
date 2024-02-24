@@ -142,7 +142,7 @@ server <- function(input, output, session) {
     })
     
 #----------------------------TABLE----------------------------# 
-  output$table_recette <- render_gt({
+  output$table_recette <- renderReactable({
     df_rec <- df_merge[,c("img", "nom","pays", "niveau", "temps","heures_minute", "cout","ISO2", "note")]
     
     if (!input$select_all) {
@@ -184,8 +184,10 @@ server <- function(input, output, session) {
             heures_minute = html(fontawesome::fa("clock"),"Temps"),
             cout = html(fontawesome::fa("sack-dollar"),"Coût/pers"),
             note = html(fontawesome::fa("star"),"Note")) |> 
-      gt_fa_rating(note, icon = "star", color = "gold") 
+      gt_fa_rating(note, icon = "star", color = "gold") |> 
+      my_render_as_ithml(selection = 'single', id = 'bla', defaultSelected = 1)
   })
+  
 #----------------------------TABLE----------------------------#  
   output$map_monde <- renderPlotly({
 
@@ -335,13 +337,29 @@ server <- function(input, output, session) {
   })
   
   observe({
-    df <- df |> 
-      filter(pays %in% input$select_pays) |> 
-      filter(niveau %in% input$select_niveau) |> 
-      filter(temps < input$select_temps)
     
-    updateSelectInput(session, "select_recette",
-                      choices = unique(df$nom))
+    df_rec <- df_merge
+    
+    if (!input$select_all) {
+      df_rec <- df_rec |>
+        filter(pays %in% input$select_pays) |>
+        filter(niveau %in% input$select_niveau) |>
+        filter(temps < input$select_temps)
+    }
+    
+    if (input$only_note) {
+      df_rec <- df_rec[complete.cases(df_rec$note), ]
+    }
+
+    selected <- reactable::getReactableState("table_recette", "selected")
+    indice  <- as.integer(selected)
+    choix <- df_rec$nom[indice]
+
+    updateSelectInput(session,
+                      "select_recette",
+                      choices =  unique(df_rec$nom),
+                      selected = choix)
+    
   })
   
   #----------------------------CLOUD----------------------------# 

@@ -28,8 +28,10 @@ library(plotly)
 library(fontawesome)
 library(bslib)
 library(gtExtras)
+library(reactable)
 
 path <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/")
+source(paste0(path, "r_function.R"))
 source(paste0(path, "ui.R"))
 source(paste0(path, "server.R"))
 
