@@ -1,17 +1,17 @@
 score_afinn <- df_comment |> 
-  select("comment_en", "nom", "pays") |>
+  select("comment_en", "nom", "pays", "ISO2") |>
   unnest_tokens(word,comment_en) |> 
   inner_join(get_sentiments("afinn")) |> 
-  group_by(nom, pays) |> 
+  group_by(nom, pays, ISO2) |> 
   mutate(nb_comment = n()) |> 
-  group_by(nom, nb_comment, pays) |>
+  group_by(nom, nb_comment, pays, ISO2) |>
   summarise(sentiment = sum(value)) |> 
   mutate(note_afinn = sentiment/nb_comment)
 
-score_bing <- df_comment |> select("comment_en", "nom", "pays") |>
+score_bing <- df_comment |> select("comment_en", "nom", "pays", "ISO2") |>
   unnest_tokens(word,comment_en) |> 
   inner_join(get_sentiments("bing")) |> 
-  group_by(nom, pays) |> 
+  group_by(nom, pays, ISO2) |> 
   summarise(
     positive = sum(sentiment == "positive"),
     negative = sum(sentiment == "negative")) |> 
@@ -24,7 +24,7 @@ max_afinn <- max(score_afinn$note_afinn)
 min_afinn <- min(score_afinn$note_afinn)
 
 score <- merge(score_afinn, score_bing, on = "nom") |>
-  select("nom", "pays","nb_comment", "note_afinn", "note_bing") |>
+  select("nom", "pays","nb_comment", "note_afinn", "note_bing", "ISO2") |>
   mutate(note = 5*((note_afinn-min_afinn)/(max_afinn - min_afinn) + (note_bing-min_bing)/(max_bing - min_bing))/2,
          note_afinn = 5*(note_afinn-min_afinn)/(max_afinn - min_afinn)/2,
          note_bing = 5*(note_bing-min_bing)/(max_bing - min_bing)/2) |>
@@ -234,22 +234,32 @@ server <- function(input, output, session) {
   
   
   output$table_note <- render_gt({
-    score |>
+    score_test <- score |>
       group_by(pays) |>
       summarise(mean_afinn = round(mean(note_afinn),2),
                 mean_bing = round(mean(note_bing),2),
                 mean_note = round(mean(note),2),
                 nb_recette = n()) |>
       filter(nb_recette > 5) |> 
-      select(pays, mean_afinn, mean_bing, mean_note) |> 
-      gt() |>
-      opt_interactive(use_compact_mode = TRUE) |>
-      tab_header("Décompostion note") |>
-      cols_label(
-        pays = html(fontawesome::fa("globe"),"Pays"),
-        mean_afinn = html(fontawesome::fa("star"),"Afinn"),
-        mean_bing = html(fontawesome::fa("star"),"Bing"),
-        mean_note = html(fontawesome::fa("star"),"Note"))
+      select(mean_afinn, mean_bing, mean_note, pays)  
+      
+    score_test <- merge(score_test, unique(score[, c("pays", "ISO2")]), by = "pays", all.x = TRUE)
+    
+     score_test |> 
+       gt() |>
+        fmt_flag(columns = ISO2) |>
+        cols_merge(
+          columns = c(pays, ISO2),
+          pattern = "{2} {1}"
+        ) |> 
+        opt_interactive(use_compact_mode = TRUE) |>
+        tab_header("Décompostion note") |>
+        cols_label(
+          pays = html(fontawesome::fa("globe"),"Pays"),
+          mean_afinn = html(fontawesome::fa("star"),"Afinn"),
+          mean_bing = html(fontawesome::fa("star"),"Bing"),
+          mean_note = html(fontawesome::fa("wand-sparkles"),"Note"))
+      
     
   })
   
