@@ -28,6 +28,7 @@ library(plotly)
 library(fontawesome)
 library(bslib)
 library(gtExtras)
+library(RColorBrewer)
 
 path <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/")
 source(paste0(path, "ui.R"))

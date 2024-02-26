@@ -53,9 +53,11 @@ server <- function(input, output, session) {
             filter(pays %in% input$select_pays) |> 
             filter(niveau %in% input$select_niveau) |> 
             filter(temps < input$select_temps))
-          
-            plot_ly(x = df_plot$cout, type = "histogram")|> 
-              layout(title = 'Répartition des coûts', plot_bgcolor = "#e5ecf6")
+        brewer_colors <- brewer.pal(6, "Paired")
+            plot_ly(x = df_plot$cout, type = "histogram", marker = list(color = "#e69f4d"))|> 
+              layout(title = 'Répartition des coûts', 
+                     bargap = 0.1,
+                     xaxis = list(title = "Coût/personne"))
 
     })
     
@@ -74,8 +76,24 @@ server <- function(input, output, session) {
       
       df_plot$pays <- factor(df_plot$pays, levels = unique(df_plot$pays)[order(df_plot$pays_n, decreasing = FALSE)])
       
-      plot_ly(x = df_plot$pays_n, y = df_plot$pays, type = "bar") |> 
-        layout(title = 'Nombre de recette par pays', plot_bgcolor = "#e5ecf6")
+      plot_ly(x = df_plot$pays_n, y = df_plot$pays, type = "bar", marker = list(color = "#3575aa")) |> 
+        layout(title = 'Nombre de recette par pays')
+    })
+    
+    
+    output$plot_temps <- renderPlotly({
+      ifelse(input$select_all,
+             df_plot <- df,
+             df_plot <- df |> 
+               filter(pays %in% input$select_pays) |> 
+               filter(niveau %in% input$select_niveau) |> 
+               filter(temps < input$select_temps))
+      
+      plot_ly(y = mean(df_plot$temps),x = df_plot$pays, type = "bar", marker = list(color = "#E3735E"))|> 
+        layout(title = 'Temps moyen par recette par pays', 
+               bargap = 0.1
+               )
+      
     })
     
 #----------------------------PLOT-NOTE-----------------------#
@@ -189,31 +207,42 @@ server <- function(input, output, session) {
 #----------------------------TABLE----------------------------#  
   output$map_monde <- renderPlotly({
 
-    
+    if(input$select_all){
+      df_mc <- df |> 
+        group_by(ISO3, pays) |> summarise(mean_temps = mean(temps))
+    } else {
     df_mc <- df |> 
-      group_by(ISO3, pays) |> summarise(mean_temps = mean(temps))
+      filter(pays %in% input$select_pays) |> 
+      filter(niveau %in% input$select_niveau) |> 
+      filter(temps < input$select_temps) |> 
+      group_by(ISO3, pays) |> summarise(mean_temps = mean(temps))}
     
     plot_ly(df_mc, type='choropleth',
             locations=df_mc$ISO3,
             z=df_mc$mean_temps,
             text=df_mc$pays,
-            colorscale="Viridis")|> 
-      layout(title = 'Temps moyens de préparation des recettes par pays',
+            colorscale="Portland")|> 
+      layout(title = 'Temps moyen de préparation des recettes par pays',
              showlegend = FALSE)
   })
   
   output$map_monde_cout <- renderPlotly({
     
-    
+    if(input$select_all){
+      df_mc <- df |> group_by(ISO3, pays) |> summarise(mean_cout = mean(cout))
+      } else {
     df_mc <- df |> 
-      group_by(ISO3, pays) |> summarise(mean_cout = mean(cout))
+      filter(pays %in% input$select_pays) |> 
+      filter(niveau %in% input$select_niveau) |> 
+      filter(temps < input$select_temps) |> 
+      group_by(ISO3, pays) |> summarise(mean_cout = mean(cout))}
     
     plot_ly(df_mc, type='choropleth',
             locations=df_mc$ISO3,
             z=df_mc$mean_cout,
             text=df_mc$pays,
-            colorscale="Viridis")|> 
-      layout(title = 'Coût moyens de préparation des recettes par pays',
+            colorscale="Portland")|> 
+      layout(title = 'Coût moyen individuel des recettes par pays',
              showlegend = FALSE)
   })
   
@@ -373,3 +402,4 @@ server <- function(input, output, session) {
   })
   
 }
+

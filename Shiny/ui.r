@@ -1,11 +1,11 @@
 path <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/")
 #source(paste0(path, "server.R"))
 
-df_comment <- read.csv("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
-df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
+#df_comment <- read.csv("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
+#df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
 
-#df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.parquet")
-#df_comment <- read.csv("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
+df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.parquet")
+df_comment <- read.csv("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
 
 df$temps <- round(df$temps,2)
 
@@ -144,15 +144,17 @@ ui <- page_navbar(
   ),
   nav_panel(
     title = "Statistiques 📊",
-    card(
-      card_header("Les coûts"),
-      plotlyOutput("plot_cout"), plotlyOutput("plot_pays")
+    navset_card_underline(
+      nav_panel("Répartition des coûts", plotlyOutput("plot_cout")), 
+      nav_panel("Répartition des recettes/pays", plotlyOutput("plot_pays")),
+      nav_panel("Temps moyen/recette", plotlyOutput("plot_temps"))
     )
   ),
   nav_panel(
     title = "Carte 🗺",
-      card(plotlyOutput("map_monde")),
-      #card(plotlyOutput("map_monde_cout"))
+      navset_card_underline(
+        nav_panel("Temps moyen",plotlyOutput("map_monde")),
+        nav_panel("Coût moyen",plotlyOutput("map_monde_cout")))
   ),
   nav_panel(
     title = "Note ⭐",
