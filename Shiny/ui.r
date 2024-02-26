@@ -104,8 +104,8 @@ ui <- page_navbar(
     title = "Recettes 🍽️",
     card(
       card_header("Les recettes"),
-      gt_output("table_recette") 
-    )
+      reactable::reactableOutput("table_recette"),
+  )
   ),
   nav_panel(
     title = "Détail recette 📋",
@@ -127,7 +127,7 @@ ui <- page_navbar(
           "Écrivez/Sélectionnez une recette : ",
           choices = NULL,
           multiple = FALSE,
-          selected = "Churros",
+          selected = NULL,
           options = list(autocomplete = TRUE))),
         column(width = 6,
                uiOutput("img_recette"))
