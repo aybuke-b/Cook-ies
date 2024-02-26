@@ -53,7 +53,7 @@ ui <- page_navbar(
       "Niveau",
       choices = unique(df$niveau),
       multiple = TRUE,
-      selected = "Facile"
+      selected = c("Facile", "Intermédiaire")
     ),
     hr(),
     materialSwitch(inputId = 'only_note', 
@@ -103,7 +103,7 @@ ui <- page_navbar(
   nav_panel(
     title = "Recettes 🍽️",
     card(
-      card_header("Les recettes"),
+      card_header("Les recettes 🥣"),
       reactable::reactableOutput("table_recette"),
   )
   ),
@@ -147,7 +147,8 @@ ui <- page_navbar(
     navset_card_underline(
       nav_panel("Répartition des coûts", plotlyOutput("plot_cout")), 
       nav_panel("Répartition des recettes/pays", plotlyOutput("plot_pays")),
-      nav_panel("Temps moyen/recette", plotlyOutput("plot_temps"))
+      nav_panel("Temps moyen/recette", plotlyOutput("plot_temps")),
+      nav_panel("Réparation des niveaux", plotlyOutput("plot_niveau"))
     )
   ),
   nav_panel(
@@ -168,7 +169,8 @@ Les deux composantes sont standardisées séparément en utilisant un centrage e
       layout_columns(
         navset_card_underline(
           nav_panel("Répartition note", plotOutput("plot_by_note")),
-          nav_panel("Top 10 pays", plotOutput("plot_note_pays"))),
+          nav_panel("Top 10 pays", plotOutput("plot_note_pays")),
+          nav_panel("Décomposition Note", gt_output("table_note"))),
         navset_card_underline(
           nav_panel("Adjectif positif et négatif", plotOutput("plot_words")),
           nav_panel("Nuage de mots", plotOutput("plot_cloud")))

@@ -23,9 +23,11 @@ min_bing <- min(score_bing$note_bing)
 max_afinn <- max(score_afinn$note_afinn)
 min_afinn <- min(score_afinn$note_afinn)
 
-score <- merge(score_afinn, score_bing, on = "nom") |> 
-  select("nom", "pays","nb_comment", "note_afinn", "note_bing") |> 
-  mutate(note = 5*((note_afinn-min_afinn)/(max_afinn - min_afinn) + (note_bing-min_bing)/(max_bing - min_bing))/2) |> 
+score <- merge(score_afinn, score_bing, on = "nom") |>
+  select("nom", "pays","nb_comment", "note_afinn", "note_bing") |>
+  mutate(note = 5*((note_afinn-min_afinn)/(max_afinn - min_afinn) + (note_bing-min_bing)/(max_bing - min_bing))/2,
+         note_afinn = 5*(note_afinn-min_afinn)/(max_afinn - min_afinn)/2,
+         note_bing = 5*(note_bing-min_bing)/(max_bing - min_bing)/2) |>
   filter(nb_comment > 5)
 
 score_pays <- score |> 
@@ -104,6 +106,22 @@ server <- function(input, output, session) {
       
     })
     
+    output$plot_niveau <- renderPlotly({
+      ifelse(input$select_all,
+             df_plot <- df,
+             df_plot <- df |> 
+               filter(pays %in% input$select_pays) |> 
+               filter(niveau %in% input$select_niveau) |> 
+               filter(temps < input$select_temps))
+      
+      
+      plot_ly(x = df_plot$niveau, type = "histogram", marker = list(color = "#e69f4d"))|> 
+        layout(title = 'Répartition des nievaux', 
+               bargap = 0.1,
+               xaxis = list(title = "Niveau"))
+      
+    })
+    
 #----------------------------PLOT-NOTE-----------------------#
     output$plot_words <- renderPlot({
       bing_count <- df_comment |> 
@@ -151,13 +169,13 @@ server <- function(input, output, session) {
     output$plot_note_pays <- renderPlot({
       score_pays |> 
         filter(nb_recette > 5) |> 
-        top_n(10) |> 
+        top_n(10, wt = note) |> 
         ggplot(aes(y = note,
                    x = fct_reorder(pays, note)))+
         geom_col(fill = "royalblue", alpha = 0.25,
                  color = "royalblue", width = 0.75)+
         coord_flip()+
-        theme_minimal()+
+        theme_minimal()+   
         labs(x = "Note",
              y = "",
              title = "Note par pays")+
@@ -214,18 +232,46 @@ server <- function(input, output, session) {
       my_render_as_ithml(selection = 'single', id = 'bla', defaultSelected = 1)
   })
   
+  
+  output$table_note <- render_gt({
+    score |>
+      group_by(pays) |>
+      summarise(mean_afinn = round(mean(note_afinn),2),
+                mean_bing = round(mean(note_bing),2),
+                mean_note = round(mean(note),2),
+                nb_recette = n()) |>
+      filter(nb_recette > 5) |> 
+      select(pays, mean_afinn, mean_bing, mean_note) |> 
+      gt() |>
+      opt_interactive(use_compact_mode = TRUE) |>
+      tab_header("Décompostion note") |>
+      cols_label(
+        pays = html(fontawesome::fa("globe"),"Pays"),
+        mean_afinn = html(fontawesome::fa("star"),"Afinn"),
+        mean_bing = html(fontawesome::fa("star"),"Bing"),
+        mean_note = html(fontawesome::fa("star"),"Note"))
+    
+  })
+  
+  
 #----------------------------TABLE----------------------------#  
   output$map_monde <- renderPlotly({
-
+    
     if(input$select_all){
-      df_mc <- df |> 
-        group_by(ISO3, pays) |> summarise(mean_temps = mean(temps))
+      df_mc <- df_merge
     } else {
-    df_mc <- df |> 
+    df_mc <- df_merge |> 
       filter(pays %in% input$select_pays) |> 
       filter(niveau %in% input$select_niveau) |> 
-      filter(temps < input$select_temps) |> 
-      group_by(ISO3, pays) |> summarise(mean_temps = mean(temps))}
+      filter(temps < input$select_temps)}
+    
+    if (input$only_note) {
+      df_mc <- df_mc[complete.cases(df_mc$note), ]
+    } 
+    
+    df_mc <- df_mc |> 
+      group_by(ISO3, pays) |> summarise(mean_temps = mean(temps))
+    
     
     plot_ly(df_mc, type='choropleth',
             locations=df_mc$ISO3,
@@ -239,13 +285,19 @@ server <- function(input, output, session) {
   output$map_monde_cout <- renderPlotly({
     
     if(input$select_all){
-      df_mc <- df |> group_by(ISO3, pays) |> summarise(mean_cout = mean(cout))
-      } else {
-    df_mc <- df |> 
-      filter(pays %in% input$select_pays) |> 
-      filter(niveau %in% input$select_niveau) |> 
-      filter(temps < input$select_temps) |> 
-      group_by(ISO3, pays) |> summarise(mean_cout = mean(cout))}
+      df_mc <- df_merge
+    } else {
+      df_mc <- df_merge |> 
+        filter(pays %in% input$select_pays) |> 
+        filter(niveau %in% input$select_niveau) |> 
+        filter(temps < input$select_temps)}
+    
+    if (input$only_note) {
+      df_mc <- df_mc[complete.cases(df_mc$note), ]
+    } 
+    
+    df_mc <- df_mc |> 
+      group_by(ISO3, pays) |> summarise(mean_cout = mean(cout))
     
     plot_ly(df_mc, type='choropleth',
             locations=df_mc$ISO3,
