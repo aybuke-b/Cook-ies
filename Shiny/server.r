@@ -88,8 +88,16 @@ server <- function(input, output, session) {
                filter(pays %in% input$select_pays) |> 
                filter(niveau %in% input$select_niveau) |> 
                filter(temps < input$select_temps))
+      df_plot <- df_plot |> 
+        group_by(pays) |> 
+        summarise(mean_temps = mean(temps))
       
-      plot_ly(y = mean(df_plot$temps),x = df_plot$pays, type = "bar", marker = list(color = "#E3735E"))|> 
+      df_plot$pays <- factor(df_plot$pays, levels = unique(df_plot$pays)[order(df_plot$mean_temps, decreasing = FALSE)])
+      
+      plot_ly(y = df_plot$mean_temps,
+              x = df_plot$pays,
+              type = "bar",
+              marker = list(color = "#E3735E"))|> 
         layout(title = 'Temps moyen par recette par pays', 
                bargap = 0.1
                )
