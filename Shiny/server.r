@@ -8,7 +8,8 @@ score_afinn <- df_comment |>
   summarise(sentiment = sum(value)) |> 
   mutate(note_afinn = sentiment/nb_comment)
 
-score_bing <- df_comment |> select("comment_en", "nom", "pays") |>
+score_bing <- df_comment |> 
+  select("comment_en", "nom", "pays") |>
   unnest_tokens(word,comment_en) |> 
   inner_join(get_sentiments("bing")) |> 
   group_by(nom, pays) |> 
@@ -30,13 +31,6 @@ score <- merge(score_afinn, score_bing, on = "nom") |>
          note_bing = 5*(note_bing-min_bing)/(max_bing - min_bing)/2) |>
   filter(nb_comment > 5)
 
-score_pays <- score |> 
-  group_by(pays) |> 
-  summarise(note = mean(note),
-            nb_comment = sum(nb_comment),
-            nb_recette = n())
-
-#df_merge <- merge(df, score, by = "nom", all = TRUE, suffixes = c("",".y"))
 df_merge <- left_join(df, score, by = c("nom" = "nom", "pays" = "pays"))
 
 df_merge <- df_merge %>%
@@ -49,14 +43,21 @@ df_merge <- df_merge %>%
 server <- function(input, output, session) {
 #----------------------------PLOT----------------------------#
     output$plot_cout <- renderPlotly({
-      ifelse(input$select_all,
-        df_plot <- df,
-        df_plot <- df |> 
-            filter(pays %in% input$select_pays) |> 
-            filter(niveau %in% input$select_niveau) |> 
-            filter(temps < input$select_temps))
-        brewer_colors <- brewer.pal(6, "Paired")
-            plot_ly(x = df_plot$cout, type = "histogram", marker = list(color = "#e69f4d"))|> 
+      if (!input$select_all) {
+        df_plot <- df_merge |>
+          filter(pays %in% input$select_pays) |>
+          filter(niveau %in% input$select_niveau) |>
+          filter(temps < input$select_temps)
+      } else {
+        df_plot <- df_merge
+      }
+      
+      if (input$only_note) {
+        df_plot <- df_plot[complete.cases(df_plot$note), ]
+      }
+      brewer_colors <- brewer.pal(6, "Paired")
+      
+      plot_ly(x = df_plot$cout, type = "histogram", marker = list(color = "#e69f4d"))|> 
               layout(title = 'Répartition des coûts', 
                      bargap = 0.1,
                      xaxis = list(title = "Coût/personne"))
@@ -64,12 +65,18 @@ server <- function(input, output, session) {
     })
     
     output$plot_pays <- renderPlotly({
-      ifelse(input$select_all,
-             df_plot <- df_merge,
-             df_plot <- df_merge |> 
-               filter(pays %in% input$select_pays) |> 
-               filter(niveau %in% input$select_niveau) |> 
-               filter(temps < input$select_temps))
+      if (!input$select_all) {
+        df_plot <- df_merge |>
+          filter(pays %in% input$select_pays) |>
+          filter(niveau %in% input$select_niveau) |>
+          filter(temps < input$select_temps)
+      } else {
+        df_plot <- df_merge
+      }
+      
+      if (input$only_note) {
+        df_plot <- df_plot[complete.cases(df_plot$note), ]
+      }
       
       df_plot <- df_plot |> 
         group_by(pays) |> 
@@ -84,12 +91,18 @@ server <- function(input, output, session) {
     
     
     output$plot_temps <- renderPlotly({
-      ifelse(input$select_all,
-             df_plot <- df,
-             df_plot <- df |> 
-               filter(pays %in% input$select_pays) |> 
-               filter(niveau %in% input$select_niveau) |> 
-               filter(temps < input$select_temps))
+      if (!input$select_all) {
+        df_plot <- df_merge |>
+          filter(pays %in% input$select_pays) |>
+          filter(niveau %in% input$select_niveau) |>
+          filter(temps < input$select_temps)
+      } else {
+        df_plot <- df_merge
+      }
+      
+      if (input$only_note) {
+        df_plot <- df_plot[complete.cases(df_plot$note), ]
+      }
       df_plot <- df_plot |> 
         group_by(pays) |> 
         summarise(mean_temps = mean(temps))
@@ -107,12 +120,18 @@ server <- function(input, output, session) {
     })
     
     output$plot_niveau <- renderPlotly({
-      ifelse(input$select_all,
-             df_plot <- df,
-             df_plot <- df |> 
-               filter(pays %in% input$select_pays) |> 
-               filter(niveau %in% input$select_niveau) |> 
-               filter(temps < input$select_temps))
+      if (!input$select_all) {
+        df_plot <- df_merge |>
+          filter(pays %in% input$select_pays) |>
+          filter(niveau %in% input$select_niveau) |>
+          filter(temps < input$select_temps)
+      } else {
+        df_plot <- df_merge
+      }
+      
+      if (input$only_note) {
+        df_plot <- df_plot[complete.cases(df_plot$note), ]
+      }
       
       
       plot_ly(x = df_plot$niveau, type = "histogram", marker = list(color = "#e69f4d"))|> 
@@ -167,6 +186,12 @@ server <- function(input, output, session) {
     })
     
     output$plot_note_pays <- renderPlot({
+      score_pays <- score |> 
+        group_by(pays) |> 
+        summarise(note = mean(note),
+                  nb_comment = sum(nb_comment),
+                  nb_recette = n())
+      
       score_pays |> 
         filter(nb_recette > 5) |> 
         top_n(10, wt = note) |> 
@@ -201,7 +226,7 @@ server <- function(input, output, session) {
     }
     
     
-    df_rec[,c("img", "nom","pays", "niveau","heures_minute", "cout","ISO2", "note")] |> 
+    df_rec[,c("img", "nom","pays", "niveau","heures_minute", "cout", "note")] |> 
         gt() |> 
           opt_interactive(use_compact_mode = TRUE) |> 
           text_transform(
@@ -213,12 +238,11 @@ server <- function(input, output, session) {
                 )
               }
             ) |> 
-      fmt_integer() |>
-      fmt_flag(columns = ISO2) |>
-      cols_merge(
-        columns = c(pays, ISO2),
-        pattern = "{2} {1}"
-      ) |>
+      #fmt_flag(columns = ISO2) |>
+      #cols_merge(
+      #  columns = c(pays, ISO2),
+      #  pattern = "{2} {1}"
+      #) |>
           tab_header("Recettes 🥣") |>
           cols_label(
             img = html(fontawesome::fa("camera-retro"),"Image"),
@@ -307,7 +331,6 @@ server <- function(input, output, session) {
       layout(title = 'Coût moyen individuel des recettes par pays',
              showlegend = FALSE)
   })
-  
 
 #----------------------------VALUE BOX----------------------------# 
 
