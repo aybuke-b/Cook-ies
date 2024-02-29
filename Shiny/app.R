@@ -22,6 +22,7 @@ library(plotly)
 library(gtExtras)
 library(reactable)
 library(RColorBrewer)
+library(haven)
 
 path <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/")
 source(paste0(path, "r_function.R"))

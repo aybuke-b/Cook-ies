@@ -37,7 +37,8 @@ df_merge <- df_merge %>%
   mutate(
     heures = floor(temps),
     minutes = round((temps - heures) * 60, 0),
-    heures_minute = paste(heures, "h", minutes, "min")
+    heures_minute = paste(heures, "h", minutes, "min"),
+    cout = abs(cout)
   )
 
 server <- function(input, output, session) {
@@ -57,7 +58,8 @@ server <- function(input, output, session) {
       }
       brewer_colors <- brewer.pal(6, "Paired")
       
-      plot_ly(x = df_plot$cout, type = "histogram", marker = list(color = "#e69f4d"))|> 
+      fig = plot_ly(x = df_plot$cout, type = "histogram", marker = list(color = "#e69f4d"))|> 
+
               layout(title = 'Répartition des coûts', 
                      bargap = 0.1,
                      xaxis = list(title = "Coût/personne"))
@@ -80,12 +82,14 @@ server <- function(input, output, session) {
       
       df_plot <- df_plot |> 
         group_by(pays) |> 
-        summarise(pays_n = n()) |> 
-        top_n(10)
+        summarise(pays_n = n())
       
       df_plot$pays <- factor(df_plot$pays, levels = unique(df_plot$pays)[order(df_plot$pays_n, decreasing = FALSE)])
       
-      plot_ly(x = df_plot$pays_n, y = df_plot$pays, type = "bar", marker = list(color = "#3575aa")) |> 
+      plot_ly(y = df_plot$pays_n,
+              x = df_plot$pays, 
+              type = "bar", 
+              marker = list(color = "#3575aa")) |> 
         layout(title = 'Nombre de recette par pays')
     })
     
@@ -133,8 +137,10 @@ server <- function(input, output, session) {
         df_plot <- df_plot[complete.cases(df_plot$note), ]
       }
       
+      df_plot$niveau <- as.factor(df_plot$niveau)
+      df_plot$niveau <- fct_relevel(df_plot$niveau, c("Facile", "Intermédiaire", "Difficile"))
       
-      plot_ly(x = df_plot$niveau, type = "histogram", marker = list(color = "#e69f4d"))|> 
+      plot_ly(y = df_plot$niveau, type = "histogram", marker = list(color = "#9ec0e4"))|> 
         layout(title = 'Répartition des nievaux', 
                bargap = 0.1,
                xaxis = list(title = "Niveau"))
