@@ -8,7 +8,8 @@ score_afinn <- df_comment |>
   summarise(sentiment = sum(value)) |> 
   mutate(note_afinn = sentiment/nb_comment)
 
-score_bing <- df_comment |> select("comment_en", "nom", "pays", "ISO2") |>
+score_bing <- df_comment |> 
+  select("comment_en", "nom", "pays", "ISO2") |>
   unnest_tokens(word,comment_en) |> 
   inner_join(get_sentiments("bing")) |> 
   group_by(nom, pays, ISO2) |> 
@@ -211,7 +212,7 @@ server <- function(input, output, session) {
     
 #----------------------------TABLE----------------------------# 
   output$table_recette <- renderReactable({
-    df_rec <- df_merge[,c("img", "nom","pays", "niveau", "temps","heures_minute", "cout","ISO2", "note")]
+    df_rec <- df_merge[,c("img", "nom","pays", "niveau", "temps","heures_minute", "cout", "note")]
     
     if (!input$select_all) {
       df_rec <- df_rec |>
