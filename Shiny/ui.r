@@ -1,10 +1,10 @@
 path <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/")
 
-df_comment <- read.csv("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
-df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
+#df_comment <- read.csv("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
+#df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
 
-#df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.parquet")
-#df_comment <- read.csv("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
+df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.parquet")
+df_comment <- read.csv("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
 
 df$temps <- round(df$temps,2)
 
@@ -28,7 +28,8 @@ color_bg <- "#2c4263"
 ui <- page_navbar(
   theme = test,
     bg = alpha(color_bg, 0.9), #2c4263
-  title = span(class = "title", img(src = "logo2.png", height = 90), "Cook'ies"),
+  title = span(class = "title", img(src = "logo2.png", height = 90), 
+               "Cook'ies", style = "Lobster, sans-serif;"),
   sidebar = sidebar(
     checkboxInput("select_all", "Tout sélectionner", value = FALSE),
     selectInput(

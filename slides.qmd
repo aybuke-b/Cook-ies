@@ -1,0 +1,172 @@
+---
+title: "Cook'ies"
+subtitle: "<script>const currentDT = new Date().toLocaleDateString();document.write(currentDT);</script>"
+author: "`Aybuké BICAT` & `Guillaume DEVANT`"
+format:
+    revealjs:
+        slide-number: true
+        mermaid-format: svg
+        chalkboard: true
+        transition: slide
+        background-transition: fade
+        theme: simple
+        incremental: true  
+        footer: "--- Big Data ---"
+        logo: https://corentinducloux.fr/dossier_img/mecen_transparent.png
+        controls : true
+        preview-links: auto
+        view-distance: 20
+        fontsize: 2.0em
+        reference-location: document
+        include-in-header:
+            - text: |
+                <style>
+                #title-slide .title {
+                font-size: 1.75em;
+                }
+                </style>
+jupyter: python3
+---
+
+
+
+## Introduction
+
+*Cook'ies, qu'est-ce que c'est ?*
+
+- Cook'ies est une application Shiny de recettes de cuisine mais pas seulement !
+
+- Les sites de recettes de cuisine sont souvent peu **ergonomiques** et présentent des **notes très subjectives** ... 
+
+- **Cook'ies est la solution à tous ces soucis !!!**
+
+- **Objectifs :** Créer une expérience utilisateur plus intuitive et objective
+
+
+:::{.notes}
+
+Cook'ies est une app shiny de recettes de cuisine du monde entier 
+
+
+
+
+
+Avant de passer à la recette de Cook'ies,  on va tout d'abord passer au + croustillant avec une présentation de notre application.
+
+
+- Présentation de l'app :
+    - page accueil assez rapide, dire l'utilité de l'app et ce qu'elle permet de faire, 
+    - toute l'application tourne au tour de la sidebar, qu'on trouvera sur chq onglet
+    - décrire les petites stats
+- Recettes :
+  - On a la base de données de toutes nos recettes, comme on l'a dit plus tôt ce tableau peut être mis à jour en fonction de vos préférences
+  - sketch sidebar pour recette pays/niveau,  et sélectionner une recette à la fin 
+- Transition détail recette:
+  - dire les éléments qu'on trouve sur la page 
+  - montrer qu'on peut rechercher une recette directement sur cette page 
+  - pas besoin de scroller ou de changer de page pour visualiser toute la recette ce qui peut être embetant lorsqu'on a les mains pleine de farine 
+
+Maintenant qu'on a vu la partie qui interesse les chefs cuisiniers, on va plonger derrière les fourneaux ! 
+Notre chef veut ouvrir son resto et se spécialisé dans la cuisine d'un de ces 5 pays, il veut alors s'interesser aux nb de recettes disponibles, et si ces recettes sont rentables dans la réalisation.
+
+- Stats :
+  - Nb de recettes par pays : 
+  - Coût/pers : Avant d'ouvrir un resto, il peut être interessant pour le chef de savoir combien cela coûtera par personne et par pays. montre graph
+  - Tps moyen :Il peut aussi se demander 
+  - Niveau de difficulté : difficulté par pays
+  
+Une autre manière de visualiser ces données de manière plus esthétiques est possible grâce aux cartes!
+
+- Cartes : 
+  - tps moyen : parler de l'algérie (tqt) et du japon (ils travaillent trop)
+- coût moyen : thailande contre lituanie
+
+- Notes :
+  - à montrer plus tard après présentation technique
+:::
+
+
+
+
+## Webscraping
+
+- Données récupérées depuis : **CuisineAZ**.
+
+- Ustensiles utilisés : Python avec `BeautifulSoup`, `requests`
+
+- Liste de course :
+  - le pays
+  - le nom de la recette
+  - l'image
+  - les ingrédients
+  - la réalisation  de la recette
+  - le coût/temps/difficulté
+  - les commentaires
+
+Extraction en **3 parties** : 
+- Récupération des pays
+- Récupération des recettes dans chaque pays
+- Récupération de la liste de course par recette
+
+:::{.notes}
+On a récupéré nos données sur CuisineAZ, 
+
+
+On avait une longue liste de course, avec lire liste
+
+Et on a effectué le scraping en 3 parties
+
+On a d'abord  récupéré les urls de chaque pays, ensuite dans chacun des pays on a récupéré les urls de chaque recette et enfin en parcourant toutes ces recettes, on a pu obtenir notre liste de course par recette qu'on a mis dans la chambre froide qui se nomme fichier JSON.
+
+On vous épargne des détails du webscraping puisqu'on a à faire à des pros dans cette salle.
+:::
+
+
+## Data cleaning
+
+Avant de commencer à cuisiner, on doit d'abord nettoyer nos ingrédients qui sont dans la chambre froide !
+
+Ustensile utilisé : package `polars` 
+
+
+Tips pour mieux réussir sa recette :
+
+- un temps claire (en heures)
+- un coût numérique 
+- le nombre de commentaires 
+- une cartographie claire (nettoyage pays)
+
+
+## Traducción
+
+Etant donné que CuisineAZ est un site français, les commentaires le sont également...
+
+Afin de nous faciliter la tâche, nous allons traduire les commentaires en anglais :
+
+- cela permet de corriger les fautes d'orthographe
+- pour l'analyse des sentiments, les dictionnaires sont en anglais 
+
+Utilisation du package `gtranslate` sur R (utilise l'API de google traduction)
+
+## Le Guide MICHELIN 
+
+*Mais comment la note a été construite ?* 😮
+
+2 composantes principales :
+- `afinn`
+- `bing`
+
+Note sur 5.
+
+:::{.notes}
+
+présentation de l'onglet note
+
+:::
+
+
+
+## Limites
+
+Pas connecté à internet (pour la base de données, actualsiation à la main)
+Si absence de commentaires, il n'y a pas de note
