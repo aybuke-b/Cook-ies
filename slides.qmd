@@ -1,5 +1,5 @@
 ---
-title: "Cook'ies"
+title: "🍪 Cook'ies 🍪"
 subtitle: "<script>const currentDT = new Date().toLocaleDateString();document.write(currentDT);</script>"
 author: "`Aybuké BICAT` & `Guillaume DEVANT`"
 format:
@@ -86,27 +86,36 @@ Une autre manière de visualiser ces données de manière plus esthétiques est 
 :::
 
 
+## Schéma
+
+![](mermaid_schema4.png){width=300}
 
 
-## Webscraping
+
+
+## Webscraping 🕸️
 
 - Données récupérées depuis : **CuisineAZ**.
 
-- Ustensiles utilisés : Python avec `BeautifulSoup`, `requests`
+- 🥢 Ustensiles utilisés : Python avec `BeautifulSoup`, `requests`
 
-- Liste de course :
-  - le pays
-  - le nom de la recette
-  - l'image
-  - les ingrédients
-  - la réalisation  de la recette
-  - le coût/temps/difficulté
-  - les commentaires
+- Liste de course 🛒:
+  - le pays 🌍
+  - le nom de la recette 🍽️ 
+  - l'image 📷
+  - les ingrédients 🥖
+  - la réalisation  de la recette 👩‍🍳
+  - le coût 💰| temps ⌛ | difficulté 📶
+  - les commentaires 💬
 
+
+:::{.fragment}
 Extraction en **3 parties** : 
 - Récupération des pays
 - Récupération des recettes dans chaque pays
 - Récupération de la liste de course par recette
+:::
+
 
 :::{.notes}
 On a récupéré nos données sur CuisineAZ, 
@@ -122,14 +131,16 @@ On vous épargne des détails du webscraping puisqu'on a à faire à des pros da
 :::
 
 
-## Data cleaning
+## Data cleaning 🧹
 
 Avant de commencer à cuisiner, on doit d'abord nettoyer nos ingrédients qui sont dans la chambre froide !
 
-Ustensile utilisé : package `polars` 
+🥢Ustensile utilisé : package `polars` 🐻‍❄️
 
+:::{.fragment}
 
-Tips pour mieux réussir sa recette :
+Tips pour mieux réussir sa recette 🎯:
+:::
 
 - un temps claire (en heures)
 - un coût numérique 
@@ -137,7 +148,7 @@ Tips pour mieux réussir sa recette :
 - une cartographie claire (nettoyage pays)
 
 
-## Traducción
+## Traducción 🌐
 
 Etant donné que CuisineAZ est un site français, les commentaires le sont également...
 
@@ -146,13 +157,21 @@ Afin de nous faciliter la tâche, nous allons traduire les commentaires en angla
 - cela permet de corriger les fautes d'orthographe
 - pour l'analyse des sentiments, les dictionnaires sont en anglais 
 
-Utilisation du package `gtranslate` sur R (utilise l'API de google traduction)
 
-## Le Guide MICHELIN 
+:::{.fragment}
+Utilisation du package `gtranslate` sur R (utilise l'API de google traduction)
+:::
+
+:::{.fragment}
+C'est le module `translate.r` qui contient le script de traduction.
+:::
+
+## Le Guide MICHELIN 🌟
 
 *Mais comment la note a été construite ?* 😮
 
 2 composantes principales :
+
 - `afinn`
 - `bing`
 

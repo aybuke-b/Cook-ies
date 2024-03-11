@@ -11,7 +11,7 @@
   <meta name="generator" content="quarto-1.4.549">
 
   <meta name="author" content="Aybuké BICAT &amp; Guillaume DEVANT">
-  <title>Cook’ies</title>
+  <title>🍪 Cook’ies 🍪</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -333,7 +333,7 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Cook’ies</h1>
+  <h1 class="title">🍪 Cook’ies 🍪</h1>
   <p class="subtitle"><script>const currentDT = new Date().toLocaleDateString();document.write(currentDT);</script></p>
 
 <div class="quarto-title-authors">
@@ -410,23 +410,29 @@
           display:block!important;
       }</style></aside>
 </section>
+<section id="schéma" class="slide level2">
+<h2>Schéma</h2>
+
+<img data-src="mermaid_schema4.png" width="300" class="r-stretch"></section>
 <section id="webscraping" class="slide level2">
-<h2>Webscraping</h2>
+<h2>Webscraping 🕸️</h2>
 <ul>
 <li class="fragment"><p>Données récupérées depuis : <strong>CuisineAZ</strong>.</p></li>
-<li class="fragment"><p>Ustensiles utilisés : Python avec <code>BeautifulSoup</code>, <code>requests</code></p></li>
-<li class="fragment"><p>Liste de course :</p>
+<li class="fragment"><p>🥢 Ustensiles utilisés : Python avec <code>BeautifulSoup</code>, <code>requests</code></p></li>
+<li class="fragment"><p>Liste de course 🛒:</p>
 <ul>
-<li class="fragment">le pays</li>
-<li class="fragment">le nom de la recette</li>
-<li class="fragment">l’image</li>
-<li class="fragment">les ingrédients</li>
-<li class="fragment">la réalisation de la recette</li>
-<li class="fragment">le coût/temps/difficulté</li>
-<li class="fragment">les commentaires</li>
+<li class="fragment">le pays 🌍</li>
+<li class="fragment">le nom de la recette 🍽️</li>
+<li class="fragment">l’image 📷</li>
+<li class="fragment">les ingrédients 🥖</li>
+<li class="fragment">la réalisation de la recette 👩‍🍳</li>
+<li class="fragment">le coût 💰| temps ⌛ | difficulté 📶</li>
+<li class="fragment">les commentaires 💬</li>
 </ul></li>
 </ul>
+<div class="fragment">
 <p>Extraction en <strong>3 parties</strong> : - Récupération des pays - Récupération des recettes dans chaque pays - Récupération de la liste de course par recette</p>
+</div>
 <aside class="notes">
 <p>On a récupéré nos données sur CuisineAZ,</p>
 <p>On avait une longue liste de course, avec lire liste</p>
@@ -446,10 +452,12 @@
       }</style></aside>
 </section>
 <section id="data-cleaning" class="slide level2">
-<h2>Data cleaning</h2>
+<h2>Data cleaning 🧹</h2>
 <p>Avant de commencer à cuisiner, on doit d’abord nettoyer nos ingrédients qui sont dans la chambre froide !</p>
-<p>Ustensile utilisé : package <code>polars</code></p>
-<p>Tips pour mieux réussir sa recette :</p>
+<p>🥢Ustensile utilisé : package <code>polars</code> 🐻‍❄️</p>
+<div class="fragment">
+<p>Tips pour mieux réussir sa recette 🎯:</p>
+</div>
 <ul>
 <li class="fragment">un temps claire (en heures)</li>
 <li class="fragment">un coût numérique</li>
@@ -458,18 +466,46 @@
 </ul>
 </section>
 <section id="traducción" class="slide level2">
-<h2>Traducción</h2>
+<h2>Traducción 🌐</h2>
 <p>Etant donné que CuisineAZ est un site français, les commentaires le sont également…</p>
 <p>Afin de nous faciliter la tâche, nous allons traduire les commentaires en anglais :</p>
 <ul>
 <li class="fragment">cela permet de corriger les fautes d’orthographe</li>
 <li class="fragment">pour l’analyse des sentiments, les dictionnaires sont en anglais</li>
 </ul>
+<div class="fragment">
 <p>Utilisation du package <code>gtranslate</code> sur R (utilise l’API de google traduction)</p>
+</div>
+<div class="fragment">
+<p>C’est le module <code>translate.r</code> qui contient le script de traduction.</p>
+</div>
 </section>
 <section id="le-guide-michelin" class="slide level2">
-<h2>Le Guide MICHELIN</h2>
+<h2>Le Guide MICHELIN 🌟</h2>
 <p><em>Mais comment la note a été construite ?</em> 😮</p>
+<p>2 composantes principales :</p>
+<ul>
+<li class="fragment"><code>afinn</code></li>
+<li class="fragment"><code>bing</code></li>
+</ul>
+<p>Note sur 5.</p>
+<aside class="notes">
+<p>présentation de l’onglet note</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="limites" class="slide level2">
+<h2>Limites</h2>
+<p>Pas connecté à internet (pour la base de données, actualsiation à la main) Si absence de commentaires, il n’y a pas de note</p>
 <div class="quarto-auto-generated-content">
 <p><img src="https://corentinducloux.fr/dossier_img/mecen_transparent.png" class="slide-logo"></p>
 <div class="footer footer-default">
