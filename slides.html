@@ -8,7 +8,7 @@
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.4.549">
+  <meta name="generator" content="quarto-1.4.545">
 
   <meta name="author" content="Aybuké BICAT &amp; Guillaume DEVANT">
   <title>🍪 Cook’ies 🍪</title>
@@ -483,14 +483,21 @@
 <section id="le-guide-michelin" class="slide level2">
 <h2>Le Guide MICHELIN 🌟</h2>
 <p><em>Mais comment la note a été construite ?</em> 😮</p>
-<p>2 composantes principales :</p>
+<p>2 composantes principales avec le package <code>tidytext</code></p>
 <ul>
-<li class="fragment"><code>afinn</code></li>
-<li class="fragment"><code>bing</code></li>
+<li class="fragment">Méthode <code>afinn</code>: on calcule la somme des scores des adjectifs, puis on divise cette somme par le nombre de commentaires</li>
+<li class="fragment">Méthode <code>bing</code>: ratio évaluant la proportion d’adjectifs positifs parmi tous les adjectifs</li>
 </ul>
-<p>Note sur 5.</p>
+<p>Standardisation échelle de 0 à 1 : <span class="math inline">\(\frac{x_i - min(x)}{max(x) - min(x)}\)</span></p>
+<p><span class="math inline">\(\rightarrow\)</span> <strong>Crée la note sur 5</strong>: en donnant un poids de <span class="math inline">\(\frac{1}{2}\)</span> à chaque méthode, en les sommant et en multipliant le tout par 5.</p>
 <aside class="notes">
-<p>présentation de l’onglet note</p>
+<ul>
+<li><p>Pourquoi on compose une note -&gt; sur le site quand ya pas de note par défault c’est 5/5.</p></li>
+<li><p>Crée une note à partir des commentaires des utilisateurs par le biais des adjectifs à l’aide de tidytext.</p></li>
+<li><p>Les 2 méthodes afinn &amp; bing pour crée deux note indépendante standardisé qu’on a ensuite fusionner dans le but d’avoir à la fin une note sur 5.</p></li>
+<li><p>Inconvénient si il n’y a pas de commentaire il n’y a pas de note.</p></li>
+<li><p><em>Présentation de la page</em> nuage de mot, adjectifs puis note final</p></li>
+</ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -503,9 +510,49 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="limites" class="slide level2">
-<h2>Limites</h2>
-<p>Pas connecté à internet (pour la base de données, actualsiation à la main) Si absence de commentaires, il n’y a pas de note</p>
+<section id="application" class="slide level2">
+<h2>Application</h2>
+<blockquote>
+<p>Application réalisé sous R <code>shiny</code> à l’aide de <code>bslib</code> et <code>shinyWidgets</code></p>
+</blockquote>
+<p>Shiny est un package R qui permet de créer <em>facilement</em> des applications web interactives pour l’analyse et la visualisation des données.</p>
+<p>✅ Avantages :</p>
+<ul>
+<li class="fragment">Intéractivité</li>
+<li class="fragment">Open Source</li>
+<li class="fragment">Bonne compatibiltié avec R</li>
+</ul>
+<p>❌ Inconvénients :</p>
+<ul>
+<li class="fragment">Lourd à développer, peu intuitif.</li>
+<li class="fragment">Performance (peut-être lent)</li>
+<li class="fragment">Documentation hasardeuse :::{.notes}</li>
+</ul>
+<p>:::</p>
+</section>
+<section id="tableau-gt-intéractif" class="slide level2">
+<h2>Tableau <code>gt</code> intéractif?</h2>
+<blockquote>
+<p>Actuellement il n’y a pas la possibilité de lier un tableau gt avec Shiny.</p>
+</blockquote>
+<ul>
+<li class="fragment"><p>Solution : Convertir le tableau <code>gt</code> en <code>reactable</code>.</p></li>
+<li class="fragment"><p>Problème dû à la conversion : Certaines features de <code>gt</code> se perdent lors de la conversion (exemple les drapeaux, le titre, …)</p></li>
+<li class="fragment"><p>Notre utilisation : Permet à l’utilisateur de sélectionner une recette dans le tableau des recettes pour la visualiser dans l’onglet Détail Recette.</p></li>
+</ul>
+</section>
+<section id="limites-du-projet" class="slide level2">
+<h2>Limites du projet</h2>
+<p><strong>Problème technique :</strong></p>
+<ul>
+<li class="fragment">Parfois, les images des recettes ne chargent pas et on ne sait pas pourquoi … 🤷🏻‍♀️</li>
+</ul>
+<p><strong>Limites :</strong></p>
+<ul>
+<li class="fragment">Pas connecté à internet : pour la base de données, actualisation à la main</li>
+<li class="fragment">Si absence de commentaires, il n’y a pas de note.</li>
+<li class="fragment">Les statistiques peu poussées dû aux données scrapées.</li>
+</ul>
 <div class="quarto-auto-generated-content">
 <p><img src="https://corentinducloux.fr/dossier_img/mecen_transparent.png" class="slide-logo"></p>
 <div class="footer footer-default">

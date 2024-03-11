@@ -170,22 +170,69 @@ C'est le module `translate.r` qui contient le script de traduction.
 
 *Mais comment la note a été construite ?* 😮
 
-2 composantes principales :
+2 composantes principales avec le package `tidytext`
 
-- `afinn`
-- `bing`
+- Méthode `afinn`: on calcule la somme des scores des adjectifs, puis on divise cette somme par le nombre de commentaires
+- Méthode `bing`: ratio évaluant la proportion d'adjectifs positifs parmi tous les adjectifs 
 
-Note sur 5.
+Standardisation échelle de 0 à 1 : $\frac{x_i - min(x)}{max(x) - min(x)}$
+
+$\rightarrow$ **Crée la note sur 5**: en donnant un poids de $\frac{1}{2}$ à chaque méthode, en les sommant et en multipliant le tout par 5.
 
 :::{.notes}
 
-présentation de l'onglet note
+- Pourquoi on compose une note -> sur le site quand ya pas de note par défault c'est 5/5. 
+
+- Crée une note à partir des commentaires des utilisateurs par le biais des adjectifs à l'aide de tidytext.
+
+- Les 2 méthodes afinn & bing pour crée deux note indépendante standardisé qu'on a ensuite fusionner dans le but d'avoir à la fin une note sur 5.
+
+- Inconvénient si il n'y a pas de commentaire il n'y a pas de note.
+
+- *Présentation de la page* nuage de mot, adjectifs puis note final
+
 
 :::
 
+## Application
 
+> Application réalisé sous R `shiny` à l'aide de `bslib` et `shinyWidgets`
 
-## Limites
+Shiny est un package R qui permet de créer *facilement* des applications web interactives pour l'analyse et la visualisation des données.
 
-Pas connecté à internet (pour la base de données, actualsiation à la main)
-Si absence de commentaires, il n'y a pas de note
+✅ Avantages : 
+
+- Intéractivité
+- Open Source
+- Bonne compatibiltié avec R
+
+❌ Inconvénients :
+
+- Lourd à développer, peu intuitif.
+- Performance (peut-être lent)
+- Documentation hasardeuse
+:::{.notes}
+
+:::
+
+## Tableau `gt` intéractif?
+
+> Actuellement il n'y a pas la possibilité de lier un tableau gt avec Shiny.
+
+- Solution : Convertir le tableau `gt` en `reactable`.
+
+- Problème dû à la conversion : Certaines features de `gt` se perdent lors de la conversion (exemple les drapeaux, le titre, ...)
+
+- Notre utilisation : Permet à l'utilisateur de sélectionner une recette dans le tableau des recettes pour la visualiser dans l'onglet Détail Recette. 
+
+## Limites du projet 
+
+**Problème technique :**
+
+- Parfois, les images des recettes ne chargent pas et on ne sait pas pourquoi ... 🤷🏻‍♀️
+
+**Limites :**
+
+- Pas connecté à internet : pour la base de données, actualisation à la main
+- Si absence de commentaires, il n'y a pas de note.
+- Les statistiques peu poussées dû aux données scrapées.
