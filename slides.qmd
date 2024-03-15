@@ -38,7 +38,7 @@ jupyter: python3
 
 - Les sites de recettes de cuisine sont souvent peu **ergonomiques** et présentent des **notes très subjectives** ... 
 
-- **Cook'ies est la solution à tous ces soucis !!!**
+- **Cook'ies est la solution à tous ces soucis !!!** ✨
 
 - **Objectifs :** Créer une expérience utilisateur plus intuitive et objective
 
@@ -88,12 +88,34 @@ Une autre manière de visualiser ces données de manière plus esthétiques est 
 
 ## Schéma
 
-![](mermaid_schema4.png){width=300}
+![](imgs/before.jpg)
+
+:::{.notes}
+
+sketch
+
+:::
+
+## Schéma
+
+![](imgs/magnifik.jpg){width= 80%}
+
+
+:::{.notes}
+
+*Gui²*
+
+*Buk*
+
+
+*Gui²*
+
+:::
 
 
 
 
-## Webscraping 🕸️ {background-image="scrapingcuisine.jpeg" background-opacity="0.2"}
+## Webscraping 🕸️ {background-image="imgs/scrapingcuisine.jpeg" background-opacity="0.2"}
 
 
 - Données récupérées depuis : **CuisineAZ**.
@@ -119,6 +141,9 @@ Extraction en **3 parties** :
 
 
 :::{.notes}
+*Buk*
+
+
 On a récupéré nos données sur CuisineAZ, 
 
 
@@ -132,7 +157,8 @@ On vous épargne des détails du webscraping puisqu'on a à faire à des pros da
 :::
 
 
-## Data cleaning 🧹
+## Data cleaning 🧹 {background-image="imgs/datacleaning.jpeg" background-opacity="0.1"}
+
 
 Avant de commencer à cuisiner, on doit d'abord nettoyer nos ingrédients qui sont dans la chambre froide !
 
@@ -149,7 +175,13 @@ Tips pour mieux réussir sa recette 🎯:
 - une cartographie claire (nettoyage pays)
 
 
-## Traducción 🌐
+:::{.notes}
+*Gui²*
+
+:::
+
+## Traducción 🌐 {background-image="imgs/traduction.jpg" background-opacity="0.2"}
+
 
 Etant donné que CuisineAZ est un site français, les commentaires le sont également...
 
@@ -167,7 +199,15 @@ Utilisation du package `gtranslate` sur R (utilise l'API de google traduction)
 C'est le module `translate.r` qui contient le script de traduction.
 :::
 
-## Le Guide MICHELIN 🌟
+
+:::{.notes}
+*Buk*
+
+:::
+
+
+## Le Guide MICHELIN 🌟 {background-image="imgs/michelin.jpg" background-opacity="0.2"}
+
 
 *Mais comment la note a été construite ?* 😮
 
@@ -175,12 +215,19 @@ C'est le module `translate.r` qui contient le script de traduction.
 
 - Méthode `afinn`: on calcule la somme des scores des adjectifs, puis on divise cette somme par le nombre de commentaires
 - Méthode `bing`: ratio évaluant la proportion d'adjectifs positifs parmi tous les adjectifs 
+  
+:::{.fragment}
 
 Standardisation échelle de 0 à 1 : $\frac{x_i - min(x)}{max(x) - min(x)}$
 
 $\rightarrow$ **Crée la note sur 5**: en donnant un poids de $\frac{1}{2}$ à chaque méthode, en les sommant et en multipliant le tout par 5.
+:::
+
+
 
 :::{.notes}
+*Gui²*
+
 
 - Pourquoi on compose une note -> sur le site quand ya pas de note par défault c'est 5/5. 
 
@@ -195,28 +242,37 @@ $\rightarrow$ **Crée la note sur 5**: en donnant un poids de $\frac{1}{2}$ à c
 
 :::
 
-## Application
+## Application {background-image="imgs/shinycuisine.jpeg" background-opacity="0.2"}
+
 
 > Application réalisé sous R `shiny` à l'aide de `bslib` et `shinyWidgets`
 
 Shiny est un package R qui permet de créer *facilement* des applications web interactives pour l'analyse et la visualisation des données.
 
+:::{.fragment}
+
 ✅ Avantages : 
+:::
 
 - Intéractivité
 - Open Source
 - Bonne compatibiltié avec R
 
+:::{.fragment}
 ❌ Inconvénients :
+:::
 
 - Lourd à développer, peu intuitif.
 - Performance (peut-être lent)
 - Documentation hasardeuse
+
 :::{.notes}
 
+*Buk*
 :::
 
-## Tableau `gt` intéractif?
+## Tableau `gt` intéractif? {background-image="imgs/tabinteractif.jpg" background-opacity="0.2"}
+
 
 > Actuellement il n'y a pas la possibilité de lier un tableau gt avec Shiny.
 
@@ -226,14 +282,27 @@ Shiny est un package R qui permet de créer *facilement* des applications web in
 
 - Notre utilisation : Permet à l'utilisateur de sélectionner une recette dans le tableau des recettes pour la visualiser dans l'onglet Détail Recette. 
 
-## Limites du projet 
+
+:::{.notes}
+*Gui²*
+:::
+
+## Limites du projet {background-image="imgs/limites.jpeg" background-opacity="0.2"}
+
 
 **Problème technique :**
 
 - Parfois, les images des recettes ne chargent pas et on ne sait pas pourquoi ... 🤷🏻‍♀️
 
+:::{.fragment}
 **Limites :**
+:::
+
 
 - Pas connecté à internet : pour la base de données, actualisation à la main
 - Si absence de commentaires, il n'y a pas de note.
 - Les statistiques peu poussées dû aux données scrapées.
+
+:::{.notes}
+*Buk*
+:::
