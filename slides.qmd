@@ -93,7 +93,8 @@ Une autre manière de visualiser ces données de manière plus esthétiques est 
 
 
 
-## Webscraping 🕸️
+## Webscraping 🕸️ {background-image="scrapingcuisine.jpeg" background-opacity="0.2"}
+
 
 - Données récupérées depuis : **CuisineAZ**.
 
