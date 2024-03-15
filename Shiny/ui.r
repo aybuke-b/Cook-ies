@@ -1,10 +1,10 @@
 path <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/")
 
-#df_comment <- read.csv("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
-#df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
+df_comment <- read.csv("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
+df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
 
-df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.parquet")
-df_comment <- read.csv("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
+#df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.parquet")
+#df_comment <- read.csv("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
 
 df$temps <- round(df$temps,2)
 
@@ -163,7 +163,7 @@ ui <- page_navbar(
         card_header("Une note basé sur les commentaires des utilisateurs ? 🤔"), 
         markdown("
 La note repose sur **deux éléments**. Un ratio évaluant la proportion d'adjectifs positifs parmi tous les adjectifs 1️⃣.
-Une évaluation basée sur [la mtéhode Afinn](http://corpustext.com/reference/sentiment_afinn.html) qui attribue un score à chaque adjectif. Pour chaque recette, on calcule la somme des scores des adjectifs, puis on divise cette somme par le nombre de commentaires 2️⃣.
+Une évaluation basée sur [la méthode Afinn](http://corpustext.com/reference/sentiment_afinn.html) qui attribue un score à chaque adjectif. Pour chaque recette, on calcule la somme des scores des adjectifs, puis on divise cette somme par le nombre de commentaires 2️⃣.
 Les deux composantes sont standardisées séparément en utilisant un centrage et une réduction. Chacune des composantes a un poids de un demi et est multipliée par 5. On les additionne et on obtient alors la note entre **0 et 5**."
       ))),
       layout_columns(
