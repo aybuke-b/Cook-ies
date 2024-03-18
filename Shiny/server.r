@@ -56,9 +56,19 @@ server <- function(input, output, session) {
       if (input$only_note) {
         df_plot <- df_plot[complete.cases(df_plot$note), ]
       }
+      
+      df_plot <- df_plot |> 
+        group_by(pays) |> 
+        summarise(mean_cout = mean(cout))
+      
+      df_plot$pays <- factor(df_plot$pays, levels = unique(df_plot$pays)[order(df_plot$mean_cout, decreasing = FALSE)])
+      
       brewer_colors <- brewer.pal(6, "Paired")
       
-      fig = plot_ly(x = df_plot$cout, type = "histogram", marker = list(color = "#e69f4d"))|> 
+      fig = plot_ly(y = df_plot$mean_cout,
+                    x = df_plot$pays,
+                    type = "bar",
+                    marker = list(color = "#e69f4d"))|> 
 
               layout(title = 'Répartition des coûts', 
                      bargap = 0.1,
@@ -111,8 +121,9 @@ server <- function(input, output, session) {
         group_by(pays) |> 
         summarise(mean_temps = mean(temps))
       
-      df_plot$pays <- factor(df_plot$pays, levels = unique(df_plot$pays)[order(df_plot$mean_temps, decreasing = FALSE)])
-      
+      df_plot$pays <- factor(df_plot$pays,
+                             levels = unique(df_plot$pays)[order(df_plot$mean_temps, decreasing = FALSE)])
+    
       plot_ly(y = df_plot$mean_temps,
               x = df_plot$pays,
               type = "bar",
@@ -140,7 +151,12 @@ server <- function(input, output, session) {
       df_plot$niveau <- as.factor(df_plot$niveau)
       df_plot$niveau <- fct_relevel(df_plot$niveau, c("Facile", "Intermédiaire", "Difficile"))
       
-      plot_ly(y = df_plot$niveau, type = "histogram", marker = list(color = "#9ec0e4"))|> 
+      df_plot$pays <- factor(df_plot$pays,
+                             levels = unique(df_plot$pays)[order(df_plot$mean_temps, decreasing = FALSE)])
+      
+      plot_ly(x = df_plot$pays,
+              color = df_plot$niveau,
+              type = "histogram")|> 
         layout(title = 'Répartition des nievaux', 
                bargap = 0.1,
                xaxis = list(title = "Niveau"))
