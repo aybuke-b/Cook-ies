@@ -151,9 +151,6 @@ server <- function(input, output, session) {
       df_plot$niveau <- as.factor(df_plot$niveau)
       df_plot$niveau <- fct_relevel(df_plot$niveau, c("Facile", "Intermédiaire", "Difficile"))
       
-      df_plot$pays <- factor(df_plot$pays,
-                             levels = unique(df_plot$pays)[order(df_plot$mean_temps, decreasing = FALSE)])
-      
       plot_ly(x = df_plot$pays,
               color = df_plot$niveau,
               type = "histogram")|> 
