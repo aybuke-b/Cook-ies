@@ -223,7 +223,11 @@ Standardisation échelle de 0 à 1 : $\frac{x_i - min(x)}{max(x) - min(x)}$
 $\rightarrow$ **Crée la note sur 5**: en donnant un poids de $\frac{1}{2}$ à chaque méthode, en les sommant et en multipliant le tout par 5.
 :::
 
+:::{.fragment}
 
+**Inconvénient** : absence de note lorsqu'il n'y a pas de commentaires.
+
+:::
 
 :::{.notes}
 *Gui²*
@@ -276,11 +280,11 @@ Shiny est un package R qui permet de créer *facilement* des applications web in
 
 > Actuellement il n'y a pas la possibilité de lier un tableau gt avec Shiny.
 
-- Solution : Convertir le tableau `gt` en `reactable`.
+- **Solution** : Convertir le tableau `gt` en `reactable`.
 
 - Problème dû à la conversion : Certaines features de `gt` se perdent lors de la conversion (exemple les drapeaux, le titre, ...)
 
-- Notre utilisation : Permet à l'utilisateur de sélectionner une recette dans le tableau des recettes pour la visualiser dans l'onglet Détail Recette. 
+- **Notre utilisation** : Permet à l'utilisateur de sélectionner une recette dans le tableau des recettes pour la visualiser dans l'onglet Détail Recette. 
 
 
 :::{.notes}
@@ -302,6 +306,7 @@ Shiny est un package R qui permet de créer *facilement* des applications web in
 - Pas connecté à internet : pour la base de données, actualisation à la main
 - Si absence de commentaires, il n'y a pas de note.
 - Les statistiques peu poussées dû aux données scrapées.
+- Problème de dimensions pour le wordcloud.
 
 :::{.notes}
 *Buk*

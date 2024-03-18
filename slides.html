@@ -413,10 +413,38 @@
 <section id="schéma" class="slide level2">
 <h2>Schéma</h2>
 
-<img data-src="imgs/before.jpg" class="r-stretch"></section>
+<img data-src="imgs/before.jpg" class="r-stretch"><aside class="notes">
+<p>sketch</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="schéma-1" class="slide level2">
 <h2>Schéma</h2>
 <p><img data-src="imgs/magnifik.jpg">{width= 80%}</p>
+<aside class="notes">
+<p><em>Gui²</em></p>
+<p><em>Buk</em></p>
+<p><em>Gui²</em></p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="webscraping" class="slide level2" data-background-image="imgs/scrapingcuisine.jpeg" data-background-opacity="0.2">
 <h2>Webscraping 🕸️</h2>
@@ -438,6 +466,7 @@
 <p>Extraction en <strong>3 parties</strong> : - Récupération des pays - Récupération des recettes dans chaque pays - Récupération de la liste de course par recette</p>
 </div>
 <aside class="notes">
+<p><em>Buk</em></p>
 <p>On a récupéré nos données sur CuisineAZ,</p>
 <p>On avait une longue liste de course, avec lire liste</p>
 <p>Et on a effectué le scraping en 3 parties</p>
@@ -468,6 +497,19 @@
 <li class="fragment">le nombre de commentaires</li>
 <li class="fragment">une cartographie claire (nettoyage pays)</li>
 </ul>
+<aside class="notes">
+<p><em>Gui²</em></p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="traducción" class="slide level2" data-background-image="imgs/traduction.jpg" data-background-opacity="0.2">
 <h2>Traducción 🌐</h2>
@@ -483,6 +525,19 @@
 <div class="fragment">
 <p>C’est le module <code>translate.r</code> qui contient le script de traduction.</p>
 </div>
+<aside class="notes">
+<p><em>Buk</em></p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="le-guide-michelin" class="slide level2" data-background-image="imgs/michelin.jpg" data-background-opacity="0.2">
 <h2>Le Guide MICHELIN 🌟</h2>
@@ -496,7 +551,11 @@
 <p>Standardisation échelle de 0 à 1 : <span class="math inline">\(\frac{x_i - min(x)}{max(x) - min(x)}\)</span></p>
 <p><span class="math inline">\(\rightarrow\)</span> <strong>Crée la note sur 5</strong>: en donnant un poids de <span class="math inline">\(\frac{1}{2}\)</span> à chaque méthode, en les sommant et en multipliant le tout par 5.</p>
 </div>
+<div class="fragment">
+<p><strong>Inconvénient</strong> : absence de note lorsqu’il n’y a pas de commentaires.</p>
+</div>
 <aside class="notes">
+<p><em>Gui²</em></p>
 <ul>
 <li><p>Pourquoi on compose une note -&gt; sur le site quand ya pas de note par défault c’est 5/5.</p></li>
 <li><p>Crée une note à partir des commentaires des utilisateurs par le biais des adjectifs à l’aide de tidytext.</p></li>
@@ -538,6 +597,19 @@
 <li class="fragment">Performance (peut-être lent)</li>
 <li class="fragment">Documentation hasardeuse</li>
 </ul>
+<aside class="notes">
+<p><em>Buk</em></p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="tableau-gt-intéractif" class="slide level2" data-background-image="imgs/tabinteractif.jpg" data-background-opacity="0.2">
 <h2>Tableau <code>gt</code> intéractif?</h2>
@@ -545,10 +617,23 @@
 <p>Actuellement il n’y a pas la possibilité de lier un tableau gt avec Shiny.</p>
 </blockquote>
 <ul>
-<li class="fragment"><p>Solution : Convertir le tableau <code>gt</code> en <code>reactable</code>.</p></li>
+<li class="fragment"><p><strong>Solution</strong> : Convertir le tableau <code>gt</code> en <code>reactable</code>.</p></li>
 <li class="fragment"><p>Problème dû à la conversion : Certaines features de <code>gt</code> se perdent lors de la conversion (exemple les drapeaux, le titre, …)</p></li>
-<li class="fragment"><p>Notre utilisation : Permet à l’utilisateur de sélectionner une recette dans le tableau des recettes pour la visualiser dans l’onglet Détail Recette.</p></li>
+<li class="fragment"><p><strong>Notre utilisation</strong> : Permet à l’utilisateur de sélectionner une recette dans le tableau des recettes pour la visualiser dans l’onglet Détail Recette.</p></li>
 </ul>
+<aside class="notes">
+<p><em>Gui²</em></p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="limites-du-projet" class="slide level2" data-background-image="imgs/limites.jpeg" data-background-opacity="0.2">
 <h2>Limites du projet</h2>
@@ -563,7 +648,21 @@
 <li class="fragment">Pas connecté à internet : pour la base de données, actualisation à la main</li>
 <li class="fragment">Si absence de commentaires, il n’y a pas de note.</li>
 <li class="fragment">Les statistiques peu poussées dû aux données scrapées.</li>
+<li class="fragment">Problème de dimensions pour le wordcloud.</li>
 </ul>
+<aside class="notes">
+<p><em>Buk</em></p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 <div class="quarto-auto-generated-content">
 <p><img src="https://corentinducloux.fr/dossier_img/mecen_transparent.png" class="slide-logo"></p>
 <div class="footer footer-default">
