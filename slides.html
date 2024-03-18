@@ -8,7 +8,7 @@
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.4.545">
+  <meta name="generator" content="quarto-1.4.549">
 
   <meta name="author" content="Aybuké BICAT &amp; Guillaume DEVANT">
   <title>🍪 Cook’ies 🍪</title>
@@ -351,7 +351,7 @@
 <ul>
 <li class="fragment"><p>Cook’ies est une application Shiny de recettes de cuisine mais pas seulement !</p></li>
 <li class="fragment"><p>Les sites de recettes de cuisine sont souvent peu <strong>ergonomiques</strong> et présentent des <strong>notes très subjectives</strong> …</p></li>
-<li class="fragment"><p><strong>Cook’ies est la solution à tous ces soucis !!!</strong></p></li>
+<li class="fragment"><p><strong>Cook’ies est la solution à tous ces soucis !!!</strong> ✨</p></li>
 <li class="fragment"><p><strong>Objectifs :</strong> Créer une expérience utilisateur plus intuitive et objective</p></li>
 </ul>
 <aside class="notes">
@@ -413,8 +413,12 @@
 <section id="schéma" class="slide level2">
 <h2>Schéma</h2>
 
-<img data-src="mermaid_schema4.png" width="300" class="r-stretch"></section>
-<section id="webscraping" class="slide level2">
+<img data-src="imgs/before.jpg" class="r-stretch"></section>
+<section id="schéma-1" class="slide level2">
+<h2>Schéma</h2>
+<p><img data-src="imgs/magnifik.jpg">{width= 80%}</p>
+</section>
+<section id="webscraping" class="slide level2" data-background-image="imgs/scrapingcuisine.jpeg" data-background-opacity="0.2">
 <h2>Webscraping 🕸️</h2>
 <ul>
 <li class="fragment"><p>Données récupérées depuis : <strong>CuisineAZ</strong>.</p></li>
@@ -451,7 +455,7 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="data-cleaning" class="slide level2">
+<section id="data-cleaning" class="slide level2" data-background-image="imgs/datacleaning.jpeg" data-background-opacity="0.1">
 <h2>Data cleaning 🧹</h2>
 <p>Avant de commencer à cuisiner, on doit d’abord nettoyer nos ingrédients qui sont dans la chambre froide !</p>
 <p>🥢Ustensile utilisé : package <code>polars</code> 🐻‍❄️</p>
@@ -465,7 +469,7 @@
 <li class="fragment">une cartographie claire (nettoyage pays)</li>
 </ul>
 </section>
-<section id="traducción" class="slide level2">
+<section id="traducción" class="slide level2" data-background-image="imgs/traduction.jpg" data-background-opacity="0.2">
 <h2>Traducción 🌐</h2>
 <p>Etant donné que CuisineAZ est un site français, les commentaires le sont également…</p>
 <p>Afin de nous faciliter la tâche, nous allons traduire les commentaires en anglais :</p>
@@ -480,7 +484,7 @@
 <p>C’est le module <code>translate.r</code> qui contient le script de traduction.</p>
 </div>
 </section>
-<section id="le-guide-michelin" class="slide level2">
+<section id="le-guide-michelin" class="slide level2" data-background-image="imgs/michelin.jpg" data-background-opacity="0.2">
 <h2>Le Guide MICHELIN 🌟</h2>
 <p><em>Mais comment la note a été construite ?</em> 😮</p>
 <p>2 composantes principales avec le package <code>tidytext</code></p>
@@ -488,8 +492,10 @@
 <li class="fragment">Méthode <code>afinn</code>: on calcule la somme des scores des adjectifs, puis on divise cette somme par le nombre de commentaires</li>
 <li class="fragment">Méthode <code>bing</code>: ratio évaluant la proportion d’adjectifs positifs parmi tous les adjectifs</li>
 </ul>
+<div class="fragment">
 <p>Standardisation échelle de 0 à 1 : <span class="math inline">\(\frac{x_i - min(x)}{max(x) - min(x)}\)</span></p>
 <p><span class="math inline">\(\rightarrow\)</span> <strong>Crée la note sur 5</strong>: en donnant un poids de <span class="math inline">\(\frac{1}{2}\)</span> à chaque méthode, en les sommant et en multipliant le tout par 5.</p>
+</div>
 <aside class="notes">
 <ul>
 <li><p>Pourquoi on compose une note -&gt; sur le site quand ya pas de note par défault c’est 5/5.</p></li>
@@ -510,27 +516,30 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="application" class="slide level2">
+<section id="application" class="slide level2" data-background-image="imgs/shinycuisine.jpeg" data-background-opacity="0.2">
 <h2>Application</h2>
 <blockquote>
 <p>Application réalisé sous R <code>shiny</code> à l’aide de <code>bslib</code> et <code>shinyWidgets</code></p>
 </blockquote>
 <p>Shiny est un package R qui permet de créer <em>facilement</em> des applications web interactives pour l’analyse et la visualisation des données.</p>
+<div class="fragment">
 <p>✅ Avantages :</p>
+</div>
 <ul>
 <li class="fragment">Intéractivité</li>
 <li class="fragment">Open Source</li>
 <li class="fragment">Bonne compatibiltié avec R</li>
 </ul>
+<div class="fragment">
 <p>❌ Inconvénients :</p>
+</div>
 <ul>
 <li class="fragment">Lourd à développer, peu intuitif.</li>
 <li class="fragment">Performance (peut-être lent)</li>
-<li class="fragment">Documentation hasardeuse :::{.notes}</li>
+<li class="fragment">Documentation hasardeuse</li>
 </ul>
-<p>:::</p>
 </section>
-<section id="tableau-gt-intéractif" class="slide level2">
+<section id="tableau-gt-intéractif" class="slide level2" data-background-image="imgs/tabinteractif.jpg" data-background-opacity="0.2">
 <h2>Tableau <code>gt</code> intéractif?</h2>
 <blockquote>
 <p>Actuellement il n’y a pas la possibilité de lier un tableau gt avec Shiny.</p>
@@ -541,13 +550,15 @@
 <li class="fragment"><p>Notre utilisation : Permet à l’utilisateur de sélectionner une recette dans le tableau des recettes pour la visualiser dans l’onglet Détail Recette.</p></li>
 </ul>
 </section>
-<section id="limites-du-projet" class="slide level2">
+<section id="limites-du-projet" class="slide level2" data-background-image="imgs/limites.jpeg" data-background-opacity="0.2">
 <h2>Limites du projet</h2>
 <p><strong>Problème technique :</strong></p>
 <ul>
 <li class="fragment">Parfois, les images des recettes ne chargent pas et on ne sait pas pourquoi … 🤷🏻‍♀️</li>
 </ul>
+<div class="fragment">
 <p><strong>Limites :</strong></p>
+</div>
 <ul>
 <li class="fragment">Pas connecté à internet : pour la base de données, actualisation à la main</li>
 <li class="fragment">Si absence de commentaires, il n’y a pas de note.</li>
