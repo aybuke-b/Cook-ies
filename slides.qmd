@@ -98,7 +98,7 @@ sketch
 
 ## Schéma
 
-![](imgs/magnifik.jpg){width= 80%}
+![](imgs/magnifik.jpg){width=90%}
 
 
 :::{.notes}
@@ -282,9 +282,10 @@ Shiny est un package R qui permet de créer *facilement* des applications web in
 
 - **Solution** : Convertir le tableau `gt` en `reactable`.
 
+- **Notre utilisation** : Permet à l'utilisateur de sélectionner une recette dans le tableau des recettes pour la visualiser dans l'onglet Détail Recette. 
+
 - Problème dû à la conversion : Certaines features de `gt` se perdent lors de la conversion (exemple les drapeaux, le titre, ...)
 
-- **Notre utilisation** : Permet à l'utilisateur de sélectionner une recette dans le tableau des recettes pour la visualiser dans l'onglet Détail Recette. 
 
 
 :::{.notes}
@@ -311,3 +312,7 @@ Shiny est un package R qui permet de créer *facilement* des applications web in
 :::{.notes}
 *Buk*
 :::
+
+
+## {background-image="imgs/naans.jpg" background-opacity="0.5"}
+
