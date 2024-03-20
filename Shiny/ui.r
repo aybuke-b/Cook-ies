@@ -145,8 +145,8 @@ ui <- page_navbar(
   nav_panel(
     title = "Statistiques 📊",
     navset_card_underline(
-      nav_panel("Répartition des coûts", plotlyOutput("plot_cout")), 
       nav_panel("Répartition des recettes/pays", plotlyOutput("plot_pays")),
+      nav_panel("Répartition des coûts", plotlyOutput("plot_cout")), 
       nav_panel("Temps moyen/recette", plotlyOutput("plot_temps")),
       nav_panel("Réparation des niveaux", plotlyOutput("plot_niveau"))
     )
