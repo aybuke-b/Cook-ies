@@ -1,10 +1,10 @@
 path <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/")
 
-df_comment <- read.csv("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
-df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
+#df_comment <- read.csv("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
+#df <- read_parquet("C:/Users/guill/OneDrive - Université de Tours/Bureau/M2/Shiny/data/recette.parquet")
 
-#df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.parquet")
-#df_comment <- read.csv("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
+df <- read_parquet("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/recette.parquet")
+df_comment <- read.csv("C:/Users/aybuk/Desktop/Cours M2/Big Data/Shiny/data/comment_en.csv", sep = ",", header = TRUE, fileEncoding = "utf-8")
 
 df$temps <- round(df$temps,2)
 
@@ -178,7 +178,9 @@ Les deux composantes sont standardisées séparément en utilisant un centrage e
   nav_spacer(),
   nav_menu(
     title = "Links",
-    align = "right"
+    align = "right",
+    nav_item(a(href="https://github.com/aybuke-b", bsicons::bs_icon("github"),"Aybuké BICAT")),
+    nav_item(a(href="https://github.com/devgui37", bsicons::bs_icon("github"),"Guillaume DEVANT"))
   )
 )
 
